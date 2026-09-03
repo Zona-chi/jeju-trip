@@ -3,343 +3,1017 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#0ea5e9">
-<title>濟州島 GOGO · 行程地圖</title>
+<meta name="theme-color" content="#F3F5F2">
+<title>JEJU 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=IBM+Plex+Mono:wght@500;600&family=Noto+Sans+TC:wght@400;500;700&display=swap">
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
 window.tailwind && (tailwind.config = {
-  theme: {
-    extend: {
-      colors: {
-        sea:  { 50:'#f0f9ff', 100:'#e0f2fe', 200:'#bae6fd', 300:'#7dd3fc', 400:'#38bdf8', 500:'#0ea5e9', 600:'#0284c7', 700:'#0369a1' },
-      },
-      fontFamily: {
-        sans: ['-apple-system','BlinkMacSystemFont','"Noto Sans TC"','"Segoe UI"','Roboto','"Helvetica Neue"','sans-serif'],
-      },
-      boxShadow: { card: '0 1px 2px rgba(15,23,42,.04), 0 6px 16px -8px rgba(15,23,42,.12)' }
-    }
-  }
+  theme: { extend: {
+    colors: {
+      sage:   { DEFAULT:'#7C9A80', soft:'#C7D8C6', tint:'#E8F0E6', deep:'#5A7A60' },
+      forest: { DEFAULT:'#1E3A2B', mid:'#2F5541' },
+      lime:   { DEFAULT:'#C8E63C', soft:'#EAF6AE', deep:'#8FA81F' },
+      paper:  { DEFAULT:'#F3F5F2', warm:'#FAFAF7' },
+      ink:    { DEFAULT:'#1B2A22', mid:'#5C6B60', dim:'#8B9A8F', line:'#E3E8DF' },
+      clay:   '#C75B4A',
+      naver:  '#03C75A',
+      gblue:  '#4285F4',
+    },
+    fontFamily: {
+      display: ['"Plus Jakarta Sans"','"Noto Sans TC"','-apple-system','sans-serif'],
+      sans:    ['"Noto Sans TC"','-apple-system','BlinkMacSystemFont','"Segoe UI"','sans-serif'],
+      mono:    ['"IBM Plex Mono"','ui-monospace','SFMono-Regular','Menlo','monospace'],
+    },
+    borderRadius: { '4xl':'2rem', '5xl':'2.5rem' },
+  }}
 });
 </script>
 <style>
+  /* ---------- 基礎（單一淺色主題，顏色全部明確指定） ---------- */
   html, body { -webkit-tap-highlight-color: transparent; }
-  body { background:#e2e8f0; }
-  .no-scrollbar::-webkit-scrollbar { display:none; }
-  .no-scrollbar { -ms-overflow-style:none; scrollbar-width:none; }
-  @supports (padding: env(safe-area-inset-bottom)) {
-    .safe-b { padding-bottom: env(safe-area-inset-bottom); }
+  body {
+    margin: 0;
+    background: #F3F5F2;
+    color: #1B2A22;
+    font-family: "Noto Sans TC", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   }
-  .fade-in { animation: fade .22s ease-out both; }
-  @keyframes fade { from { opacity:0; transform: translateY(4px); } to { opacity:1; transform:none; } }
+  * { -webkit-text-size-adjust: 100%; }
 
-  /* 三個分頁 */
-  #view-plan, #view-list { display: block; }
-  #view-map { display: flex; flex-direction: column; height: 100dvh; }
-  #app[data-view="plan"] #view-list, #app[data-view="plan"] #view-map  { display: none; }
-  #app[data-view="list"] #view-plan, #app[data-view="list"] #view-map  { display: none; }
-  #app[data-view="map"]  #view-plan, #app[data-view="map"]  #view-list { display: none; }
-  #days > article { scroll-margin-top: 4.5rem; }
-  :root { --nav-h: 4.25rem; }
+  /* ---------- 背景：等高線紋理 + 柔和色塊 ---------- */
+  .deco { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+  .deco-blobs {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(48% 32% at 88% -4%, rgba(200,230,60,.30), transparent 70%),
+      radial-gradient(52% 36% at 6% 22%, rgba(124,154,128,.20), transparent 72%),
+      radial-gradient(60% 40% at 96% 104%, rgba(124,154,128,.18), transparent 70%),
+      #F3F5F2;
+  }
+
+  /* ---------- 拱形 ---------- */
+  .arch      { border-radius: 999px 999px 2rem 2rem; }
+  .arch-tile { border-radius: 999px 999px .7rem .7rem; }
+
+  /* ---------- 兩個分頁 ---------- */
+  #view-plan, #view-places { display: block; }
+  #app[data-view="plan"]   #view-places { display: none; }
+  #app[data-view="places"] #view-plan   { display: none; }
+  #days > article { scroll-margin-top: 5.2rem; }
+
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  @supports (padding: env(safe-area-inset-bottom)) { .safe-b { margin-bottom: env(safe-area-inset-bottom); } }
+
+  /* 毛玻璃：沒有 backdrop-filter 支援時退回不透明白底 */
+  .glass { background: rgba(255,255,255,.72); }
+  @supports not ((backdrop-filter: blur(8px)) or (-webkit-backdrop-filter: blur(8px))) {
+    .glass { background: rgba(255,255,255,.94); }
+  }
+
+  input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; }
+  :focus-visible { outline: 2px solid #5A7A60; outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+  .fade-in { animation: fade .24s ease-out both; }
+  @keyframes fade { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+  .tnum { font-variant-numeric: tabular-nums; }
 </style>
 </head>
-<body class="font-sans text-slate-800">
+<body>
+<!-- ===== 最底層裝飾：柔和色塊 + 等高線 ===== -->
+<div class="deco" aria-hidden="true">
+  <div class="deco-blobs"></div>
+  <svg class="absolute -top-24 -right-40 w-[420px] h-[420px]" viewBox="0 0 200 200" fill="none">
+    <g stroke="#7C9A80" stroke-opacity=".16" stroke-width=".8">
+      <ellipse cx="100" cy="100" rx="26" ry="18" transform="rotate(-18 100 100)"/>
+      <ellipse cx="100" cy="100" rx="40" ry="28" transform="rotate(-18 100 100)"/>
+      <ellipse cx="100" cy="100" rx="55" ry="38" transform="rotate(-18 100 100)"/>
+      <ellipse cx="100" cy="100" rx="70" ry="49" transform="rotate(-18 100 100)"/>
+      <ellipse cx="100" cy="100" rx="85" ry="60" transform="rotate(-18 100 100)"/>
+      <ellipse cx="100" cy="100" rx="99" ry="71" transform="rotate(-18 100 100)"/>
+    </g>
+  </svg>
+  <svg class="absolute bottom-[-120px] -left-32 w-[380px] h-[380px]" viewBox="0 0 200 200" fill="none">
+    <g stroke="#7C9A80" stroke-opacity=".14" stroke-width=".8">
+      <ellipse cx="100" cy="100" rx="22" ry="30" transform="rotate(24 100 100)"/>
+      <ellipse cx="100" cy="100" rx="35" ry="46" transform="rotate(24 100 100)"/>
+      <ellipse cx="100" cy="100" rx="49" ry="63" transform="rotate(24 100 100)"/>
+      <ellipse cx="100" cy="100" rx="63" ry="80" transform="rotate(24 100 100)"/>
+      <ellipse cx="100" cy="100" rx="78" ry="97" transform="rotate(24 100 100)"/>
+    </g>
+  </svg>
+</div>
 
-<div id="app" data-view="plan" class="mx-auto w-full max-w-md min-h-dvh bg-slate-50 shadow-2xl relative">
+<div id="app" data-view="plan" class="relative z-10 mx-auto w-full max-w-md min-h-dvh">
 
-  <!-- ============ 分頁 0：行程規劃 ============ -->
+  <!-- ==================== 分頁 1：行程 ==================== -->
   <section id="view-plan">
-    <header class="bg-gradient-to-b from-sea-500 to-sea-600 text-white px-5 pt-6 pb-4 shadow-lg shadow-sea-600/20">
-      <p class="text-[11px] tracking-[0.25em] text-sea-100/90 font-medium">ITINERARY</p>
-      <div class="flex items-end justify-between mt-0.5">
-        <h1 class="text-2xl font-bold leading-tight">行程規劃</h1>
-        <p class="text-xs text-sea-100/90 pb-1">10/24–10/29 · 6 天</p>
+    <header class="px-5 pt-8">
+      <div class="flex items-start justify-between">
+        <div>
+          <p class="font-mono text-[10px] tracking-[0.32em] text-sage-deep">OCT 2026 · 6 DAYS</p>
+          <h1 class="font-display text-[52px] font-extrabold leading-[0.95] tracking-[-0.03em] text-forest mt-1">JEJU</h1>
+        </div>
+        <div class="glass backdrop-blur-md ring-1 ring-white/70 shadow-sm rounded-full px-3.5 py-2 text-center">
+          <p class="font-mono text-[9px] tracking-[0.14em] text-ink-dim">TRIP</p>
+          <p class="font-display text-[13px] font-extrabold text-forest tnum">10/24–29</p>
+        </div>
+      </div>
+
+      <!-- 拱形視覺區塊（純 SVG，沒有照片） -->
+      <div class="arch relative overflow-hidden mt-5 h-[196px] ring-1 ring-white/70 shadow-sm">
+        <svg class="absolute inset-0 w-full h-full" viewBox="0 0 360 196" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+          <defs>
+            <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#FAFAF7"/><stop offset="1" stop-color="#E8F0E6"/>
+            </linearGradient>
+          </defs>
+          <rect width="360" height="196" fill="url(#sky)"/>
+          <circle cx="252" cy="56" r="25" fill="#C8E63C" opacity=".9"/>
+          <g stroke="#7C9A80" stroke-opacity=".28" stroke-width="1" fill="none">
+            <path d="M20,40 C34,32 46,32 60,40"/><path d="M28,50 C40,44 50,44 62,50"/>
+          </g>
+          <path d="M0,128 C56,92 104,102 152,126 C202,151 244,100 296,112 C324,118 344,126 360,131 L360,196 L0,196 Z" fill="#C7D8C6"/>
+          <path d="M0,154 C48,132 94,138 138,156 C188,176 230,144 278,152 C314,158 340,164 360,168 L360,196 L0,196 Z" fill="#7C9A80"/>
+          <path d="M0,178 C46,165 90,169 130,180 C178,193 224,172 270,178 C308,183 338,188 360,191 L360,196 L0,196 Z" fill="#1E3A2B"/>
+          <g stroke="#FAFAF7" stroke-opacity=".5" stroke-width="1.2" fill="none">
+            <path d="M96,186 C112,181 128,181 144,186"/><path d="M188,190 C204,185 220,185 236,190"/>
+          </g>
+        </svg>
+        <div class="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-forest/75 via-forest/35 to-transparent"></div>
+        <div class="absolute inset-x-0 bottom-0 p-4">
+          <p class="font-display text-[15px] font-extrabold text-paper-warm">濟州島 · 楓葉與海</p>
+          <p class="font-mono text-[10px] tracking-[0.16em] text-paper-warm/80 mt-0.5">38 STOPS · 6 DAYS</p>
+        </div>
       </div>
     </header>
 
-    <div class="sticky top-0 z-20 bg-slate-50/95 backdrop-blur border-b border-slate-200/70 shadow-sm">
+    <div class="sticky top-0 z-30 glass backdrop-blur-md mt-4">
       <div id="daynav" class="flex gap-2 px-4 py-3 overflow-x-auto no-scrollbar"></div>
     </div>
 
-    <main id="days" class="px-4 pt-4 pb-28 space-y-4"></main>
+    <main id="days" class="px-4 pt-3 pb-32 space-y-4"></main>
   </section>
 
-  <!-- ============ 分頁 1：地點清單 ============ -->
-  <section id="view-list">
-    <!-- Header -->
-    <header class="bg-gradient-to-b from-sea-500 to-sea-600 text-white px-5 pt-6 pb-4 shadow-lg shadow-sea-600/20">
-      <div class="flex items-end justify-between">
-        <div>
-          <p class="text-[11px] tracking-[0.25em] text-sea-100/90 font-medium">JEJU ISLAND</p>
-          <h1 class="text-2xl font-bold leading-tight mt-0.5">濟州島 GOGO</h1>
-        </div>
-        <p class="text-xs text-sea-100/90 pb-1"><span id="count">0</span> 個地點</p>
+  <!-- ==================== 分頁 2：地點清單 ==================== -->
+  <section id="view-places">
+    <header class="px-5 pt-8">
+      <p class="font-mono text-[10px] tracking-[0.32em] text-sage-deep">SAVED PLACES</p>
+      <div class="flex items-end justify-between mt-1">
+        <h1 class="font-display text-[34px] font-extrabold leading-none tracking-[-0.02em] text-forest">地點清單</h1>
+        <p class="font-mono text-[11px] text-ink-dim pb-1"><span id="count">0</span> / 101</p>
       </div>
 
-      <!-- Search -->
       <div class="relative mt-4">
-        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-sea-100/80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <span id="searchIcon" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-sage-deep"></span>
         <input id="search" type="search" inputmode="search" placeholder="搜尋名稱、韓文名或區域…"
-          class="w-full bg-white/20 placeholder:text-sea-100/80 text-white text-sm rounded-xl pl-9 pr-3 py-2.5 outline-none focus:bg-white/25 focus:ring-2 focus:ring-white/40 transition">
+          class="w-full glass backdrop-blur-md ring-1 ring-white/70 shadow-sm rounded-2xl pl-10 pr-4 py-3 text-[14px] text-ink placeholder:text-ink-dim outline-none focus:ring-sage">
       </div>
     </header>
 
-    <!-- Category pills -->
-    <div class="sticky top-0 z-20 bg-slate-50/95 backdrop-blur border-b border-slate-200/70 shadow-sm">
+    <div class="sticky top-0 z-30 glass backdrop-blur-md mt-4">
       <div id="pills" class="flex gap-2 px-4 py-3 overflow-x-auto no-scrollbar"></div>
     </div>
 
-    <!-- Cards -->
-    <main id="cards" class="px-4 pt-4 pb-28 space-y-3"></main>
+    <main id="cards" class="px-4 pt-3 pb-32 space-y-3"></main>
   </section>
 
-  <!-- ============ 分頁 2：地圖總覽 ============ -->
-  <section id="view-map">
-    <header class="shrink-0 bg-gradient-to-b from-sea-500 to-sea-600 text-white px-5 pt-6 pb-4">
-      <p class="text-[11px] tracking-[0.25em] text-sea-100/90 font-medium">MY MAPS</p>
-      <div class="flex items-center justify-between mt-0.5">
-        <h1 class="text-2xl font-bold leading-tight">地圖總覽</h1>
-        <a href="https://www.google.com/maps/d/viewer?mid=1lUx-Eh6Ubb7dagCKzkYyLUUIZ8kroDE" target="_blank" rel="noopener"
-           class="text-xs bg-white/20 hover:bg-white/30 rounded-lg px-3 py-1.5 font-medium transition">在 Google 開啟</a>
-      </div>
-    </header>
-    <!-- flex-1 撐滿剩餘視窗高度 -->
-    <div class="flex-1 min-h-0 bg-slate-200">
-      <iframe
-        src="https://www.google.com/maps/d/embed?mid=1lUx-Eh6Ubb7dagCKzkYyLUUIZ8kroDE&ehbc=2E312F"
-        class="w-full h-full border-0" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
-        title="濟州島行程地圖"></iframe>
-    </div>
-    <!-- 底部導覽列的佔位空間 -->
-    <div class="shrink-0 safe-b" style="height: var(--nav-h);"></div>
-  </section>
-
-  <!-- ============ Bottom Navigation ============ -->
-  <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md z-40 bg-white border-t border-slate-200 shadow-[0_-4px_16px_-8px_rgba(15,23,42,.15)] safe-b">
-    <div class="grid grid-cols-3">
-      <button data-tab="plan" class="nav-btn flex flex-col items-center gap-1 py-2.5 text-sea-600">
-        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M8 3v3M16 3v3M3 10h18"/><path d="M7.5 14h3M7.5 17.5h6"/></svg>
-        <span class="text-[11px] font-semibold">行程</span>
+  <!-- ==================== 懸浮膠囊導覽列 ==================== -->
+  <nav class="fixed bottom-5 left-1/2 -translate-x-1/2 z-40 w-[min(22rem,calc(100%-2.5rem))] safe-b">
+    <div class="glass backdrop-blur-xl ring-1 ring-white/70 shadow-[0_10px_30px_-10px_rgba(27,42,34,.28)] rounded-full p-1.5 flex gap-1.5">
+      <button data-tab="plan" class="navBtn flex-1 flex items-center justify-center gap-2 rounded-full py-2.5">
+        <span class="navIcon"></span><span class="text-[12.5px] font-bold">行程</span>
       </button>
-      <button data-tab="list" class="nav-btn flex flex-col items-center gap-1 py-2.5 text-slate-400">
-        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="3.5" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="3.5" cy="18" r="1.2" fill="currentColor" stroke="none"/></svg>
-        <span class="text-[11px] font-semibold">地點清單</span>
-      </button>
-      <button data-tab="map" class="nav-btn flex flex-col items-center gap-1 py-2.5 text-slate-400">
-        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3 4 5v16l5-2 6 2 5-2V3l-5 2-6-2Z"/><path d="M9 3v16M15 5v16"/></svg>
-        <span class="text-[11px] font-semibold">地圖總覽</span>
+      <button data-tab="places" class="navBtn flex-1 flex items-center justify-center gap-2 rounded-full py-2.5">
+        <span class="navIcon"></span><span class="text-[12.5px] font-bold">地點清單</span>
       </button>
     </div>
   </nav>
 
-  <!-- Toast -->
-  <div id="toast" class="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 bg-slate-900/90 text-white text-xs px-4 py-2.5 rounded-full opacity-0 pointer-events-none transition-opacity duration-200"></div>
+  <div id="toast" class="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 bg-forest text-paper-warm text-xs px-4 py-2.5 rounded-full opacity-0 pointer-events-none transition-opacity duration-200"></div>
 </div>
 
 <script>
-/* ===================== 資料 ===================== */
+/* =========================================================
+   JEJU 2026 — 行程 + 地點清單
+   ========================================================= */
+
+/* ---------------- Icon（行內 SVG，Lucide 風格 24×24 / stroke 1.8） ---------------- */
+const ICONS = {
+  plane:    '<path d="M21.5 2.5 10.8 13.2M21.5 2.5 14.6 22l-3.8-8.8L2 9.4 21.5 2.5Z"/>',
+  car:      '<path d="M4.2 13.2 5.9 8a2 2 0 0 1 1.9-1.4h8.4a2 2 0 0 1 1.9 1.4l1.7 5.2"/><path d="M2.8 13.2h18.4v4.1a.9.9 0 0 1-.9.9h-1.5a.9.9 0 0 1-.9-.9v-.9H6v.9a.9.9 0 0 1-.9.9H3.7a.9.9 0 0 1-.9-.9v-4.1Z"/><path d="M6.6 15.6h1.6M15.8 15.6h1.6"/>',
+  bed:      '<path d="M3 18.5V7"/><path d="M3 12h13.5A4.5 4.5 0 0 1 21 16.5v2"/><path d="M3 18.5h18"/><circle cx="8" cy="9.2" r="2"/>',
+  door:     '<path d="M13.5 3.5H18a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1h-4.5"/><path d="M13.5 20.5V3.5L5.5 5.4v13.2l8 1.9Z"/><circle cx="10.4" cy="12" r=".8" fill="currentColor" stroke="none"/>',
+  camera:   '<path d="M4 8.2h2.6l1.2-2h8.4l1.2 2H20a1 1 0 0 1 1 1v8.6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.2a1 1 0 0 1 1-1Z"/><circle cx="12" cy="13.5" r="3.1"/>',
+  waves:    '<path d="M2.5 8.4c2-2.2 4.2-2.2 6.2 0s4.2 2.2 6.2 0 4.2-2.2 6.6 0"/><path d="M2.5 13c2-2.2 4.2-2.2 6.2 0s4.2 2.2 6.2 0 4.2-2.2 6.6 0"/><path d="M2.5 17.6c2-2.2 4.2-2.2 6.2 0s4.2 2.2 6.2 0 4.2-2.2 6.6 0"/>',
+  leaf:     '<path d="M4.5 19.8C4.5 11.4 9.6 6.6 20 5.6c0 10.8-5.2 14.6-11.2 14.6-2.3 0-4.3-.4-4.3-.4Z"/><path d="M5.2 19.2C8.6 14.8 12.6 11.8 18.4 9.4"/>',
+  mountain: '<path d="M2.2 19h19.6L14.4 5.6 10 13.2 8 10.4 2.2 19Z"/>',
+  ship:     '<path d="M3.2 15.4 12 12.2l8.8 3.2-1.6 4.1a1 1 0 0 1-.9.6H5.7a1 1 0 0 1-.9-.6l-1.6-4.1Z"/><path d="M6.4 12.6V7.6h11.2v5"/><path d="M12 4.2v3.4"/>',
+  bag:      '<path d="M5.2 8h13.6l-1 12.2H6.2L5.2 8Z"/><path d="M9 8V6.2a3 3 0 0 1 6 0V8"/>',
+  utensils: '<path d="M6.2 3v7.4a2.6 2.6 0 0 0 5.2 0V3"/><path d="M8.8 11v10"/><path d="M17.4 3c2 1.6 2.4 4.1 1.9 6.6-.4 2-1.5 2.4-1.5 4.4V21"/>',
+  coffee:   '<path d="M4 8h12.2v5.8a4.2 4.2 0 0 1-4.2 4.2H8.2A4.2 4.2 0 0 1 4 13.8V8Z"/><path d="M16.2 9.6h1.7a2.3 2.3 0 0 1 0 4.6h-1.7"/><path d="M4 21h12.2"/>',
+  nav:      '<path d="M21.5 2.5 14.6 22l-3.8-8.8L2 9.4 21.5 2.5Z"/>',
+  search:   '<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/>',
+  copy:     '<rect x="9" y="9" width="11" height="11" rx="2.2"/><path d="M5 15V5.2A2.2 2.2 0 0 1 7.2 3H17"/>',
+  pin:      '<path d="M12 21.5s-7-6.4-7-11.5a7 7 0 1 1 14 0c0 5.1-7 11.5-7 11.5Z"/><circle cx="12" cy="10" r="2.6"/>',
+  calendar: '<rect x="3" y="4.6" width="18" height="16" rx="2.4"/><path d="M8 2.6v3.4M16 2.6v3.4M3 10h18"/><path d="M7.6 14h3M7.6 17.4h6"/>',
+  list:     '<path d="M8.5 6.5H21M8.5 12H21M8.5 17.5H21"/><circle cx="3.8" cy="6.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="3.8" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="3.8" cy="17.5" r="1.3" fill="currentColor" stroke="none"/>',
+};
+function icon(name, cls = 'w-5 h-5') {
+  return `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name] || ''}</svg>`;
+}
+
+/* ---------------- 色調：一種色調對應一種意義，兩個分頁共用 ---------------- */
+const TONE = {
+  nature: 'bg-sage-tint text-sage-deep',
+  meal:   'bg-white ring-1 ring-sage-soft text-forest',
+  sweet:  'bg-lime-soft text-lime-deep',
+  warm:   'bg-clay/12 text-clay',
+  solid:  'bg-forest text-lime',
+  plain:  'bg-white ring-1 ring-ink-line text-ink-dim',
+};
+
+/* ---------------- 行程類別 → Icon / 色調 / 標籤 ---------------- */
+const CAT = {
+  flight:  { icon:'plane',    label:'航班',   tone:'plain'  },
+  car:     { icon:'car',      label:'租車',   tone:'plain'  },
+  stay:    { icon:'bed',      label:'住宿',   tone:'solid'  },
+  checkout:{ icon:'door',     label:'退房',   tone:'plain'  },
+  shop:    { icon:'bag',      label:'逛街',   tone:'warm'   },
+  sight:   { icon:'camera',   label:'景點',   tone:'nature' },
+  beach:   { icon:'waves',    label:'海邊',   tone:'nature' },
+  foliage: { icon:'leaf',     label:'賞葉',   tone:'warm'   },
+  cave:    { icon:'mountain', label:'洞窟',   tone:'nature' },
+  island:  { icon:'ship',     label:'離島',   tone:'nature' },
+  brunch:  { icon:'utensils', label:'早午餐', tone:'meal'   },
+  lunch:   { icon:'utensils', label:'午餐',   tone:'meal'   },
+  dinner:  { icon:'utensils', label:'晚餐',   tone:'meal'   },
+  cafe:    { icon:'coffee',   label:'咖啡廳', tone:'sweet'  },
+  dessert: { icon:'coffee',   label:'點心',   tone:'sweet'  },
+};
+
+/* ---------------- 地點清單類別 ---------------- */
+const PCATS = [
+  { key:'all',  label:'全部',     icon:'list',     tone:'plain'  },
+  { key:'spot', label:'景點',     icon:'camera',   tone:'nature' },
+  { key:'food', label:'吃喝',     icon:'utensils', tone:'meal'   },
+  { key:'cafe', label:'咖啡甜點', icon:'coffee',   tone:'sweet'  },
+  { key:'shop', label:'購物',     icon:'bag',      tone:'warm'   },
+];
+const pcat = k => PCATS.find(c => c.key === k) || PCATS[0];
+
+const WD = ['日','一','二','三','四','五','六'];
+const TRIP = [
+ {
+  "date": "2026/10/24",
+  "wd": 6,
+  "zones": [
+   "市區",
+   "涯月"
+  ],
+  "items": [
+   {
+    "cat": "flight",
+    "title": "班機 LJ764",
+    "note": "桃園出發"
+   },
+   {
+    "cat": "car",
+    "title": "租車取車",
+    "note": "10/24 08:00 取車 → 10/29 19:00 還車"
+   },
+   {
+    "cat": "brunch",
+    "title": "Gogugsu",
+    "kr": "고국수",
+    "dish": "帶魚湯麵／豬肉湯麵",
+    "tags": [
+     "預約"
+    ],
+    "hours": "帶魚湯麵只到早上 10:00",
+    "nav": {
+     "lat": 33.5064195,
+     "lng": 126.509232,
+     "kr": "고국수"
+    }
+   },
+   {
+    "cat": "shop",
+    "title": "市區逛街",
+    "note": "順便買個麵包當隔天早餐"
+   },
+   {
+    "cat": "beach",
+    "title": "涯月海邊",
+    "kr": "애월 한담해안산책로",
+    "note": "漢潭海岸散步路",
+    "nav": {
+     "q": "애월 한담해안산책로"
+    }
+   },
+   {
+    "cat": "cafe",
+    "title": "베릴 Beryl",
+    "kr": "베릴",
+    "note": "No kids — 13 歲以下不可入場",
+    "nav": {
+     "lat": 33.3975848,
+     "lng": 126.2425697,
+     "kr": "베릴"
+    }
+   },
+   {
+    "cat": "beach",
+    "title": "挾才海水浴場",
+    "kr": "협재해수욕장",
+    "note": "17:30 日落",
+    "nav": {
+     "lat": 33.3942945,
+     "lng": 126.2398813,
+     "kr": "협재해수욕장"
+    }
+   },
+   {
+    "cat": "dinner",
+    "title": "靑草水水拌生魚片 濟州店",
+    "kr": "청초수물회 제주점",
+    "dish": "水拌生魚片／鮑魚粥",
+    "tags": [
+     "預約"
+    ],
+    "nav": {
+     "lat": 33.4566582,
+     "lng": 126.3091233,
+     "kr": "청초수물회 제주점"
+    }
+   },
+   {
+    "cat": "stay",
+    "title": "涯月住宿",
+    "note": "47-82 Haeami-gil, Aewol-eup, Jeju",
+    "nav": {
+     "q": "47-82 Haeami-gil, Aewol-eup, Jeju"
+    },
+    "copy": "47-82 Haeami-gil, Aewol-eup, Jeju"
+   }
+  ]
+ },
+ {
+  "date": "2026/10/25",
+  "wd": 0,
+  "zones": [
+   "西歸浦"
+  ],
+  "items": [
+   {
+    "cat": "sight",
+    "title": "偶來市場",
+    "kr": "서귀포매일올레시장",
+    "nav": {
+     "q": "서귀포매일올레시장"
+    }
+   },
+   {
+    "cat": "dessert",
+    "title": "老奶奶的年糕",
+    "kr": "할머니떡집",
+    "note": "偶來市場一帶",
+    "nav": {
+     "lat": 33.2486024,
+     "lng": 126.5642223,
+     "kr": "할머니떡집"
+    }
+   },
+   {
+    "cat": "lunch",
+    "title": "생원전복",
+    "kr": "생원전복",
+    "dish": "鮑魚石鍋飯",
+    "nav": {
+     "lat": 33.2458179,
+     "lng": 126.3307228,
+     "kr": "생원전복"
+    }
+   },
+   {
+    "cat": "sight",
+    "title": "龍頭海岸",
+    "kr": "용머리해안",
+    "note": "依潮位與天氣會封閉，出發前先查開放狀況",
+    "nav": {
+     "lat": 33.2316155,
+     "lng": 126.3148321,
+     "kr": "용머리해안"
+    }
+   },
+   {
+    "cat": "beach",
+    "title": "沙溪海岸",
+    "kr": "사계해안",
+    "nav": {
+     "lat": 33.2231459,
+     "lng": 126.297477,
+     "kr": "사계해안"
+    }
+   },
+   {
+    "cat": "dinner",
+    "title": "豚魚吉",
+    "kr": "돈어길",
+    "dish": "黑豬肉烤肉",
+    "tags": [
+     "預約"
+    ],
+    "nav": {
+     "lat": 33.28076,
+     "lng": 126.2854572,
+     "kr": "돈어길"
+    }
+   },
+   {
+    "cat": "sight",
+    "title": "Osulloc 茶博物館",
+    "kr": "오설록 티 뮤지엄",
+    "rain": true,
+    "nav": {
+     "lat": 33.3059385,
+     "lng": 126.2894355,
+     "kr": "오설록 티 뮤지엄"
+    }
+   }
+  ]
+ },
+ {
+  "date": "2026/10/26",
+  "wd": 1,
+  "zones": [
+   "漢拏山",
+   "市區"
+  ],
+  "items": [
+   {
+    "cat": "lunch",
+    "title": "Shinjeju Bomal Kalguksu",
+    "kr": "신제주보말칼국수 제주본점",
+    "dish": "海螺刀削麵／餃子",
+    "hours": "08:00–15:00",
+    "closed": 0,
+    "nav": {
+     "lat": 33.4879343,
+     "lng": 126.500021,
+     "kr": "신제주보말칼국수 제주본점"
+    }
+   },
+   {
+    "cat": "foliage",
+    "title": "天娥溪谷",
+    "kr": "천아계곡",
+    "note": "賞楓",
+    "nav": {
+     "lat": 33.3971528,
+     "lng": 126.459872,
+     "kr": "천아계곡"
+    }
+   },
+   {
+    "cat": "foliage",
+    "title": "御里牧路線",
+    "kr": "어리목계곡",
+    "note": "賞楓",
+    "nav": {
+     "lat": 33.3891192,
+     "lng": 126.4942262,
+     "kr": "어리목계곡"
+    }
+   },
+   {
+    "cat": "foliage",
+    "title": "天王寺",
+    "kr": "대한불교조계종 천왕사",
+    "note": "賞楓",
+    "nav": {
+     "lat": 33.4087029,
+     "lng": 126.4944197,
+     "kr": "대한불교조계종 천왕사"
+    }
+   },
+   {
+    "cat": "dinner",
+    "title": "丈母食卓",
+    "kr": "장모식탁",
+    "dish": "鮑魚石鍋飯／醃鮑魚／醬蟹",
+    "tags": [
+     "預約"
+    ],
+    "closed": 0,
+    "nav": {
+     "lat": 33.4971067,
+     "lng": 126.546788,
+     "kr": "장모식탁"
+    }
+   },
+   {
+    "cat": "stay",
+    "title": "細花住宿（換住宿）",
+    "kr": "제주시 구좌읍 세화합전2길 31-1",
+    "note": "31-1 Sehwahapjeon 2-gil, Gujwa-eup",
+    "nav": {
+     "q": "제주시 구좌읍 세화합전2길 31-1"
+    },
+    "copy": "제주시 구좌읍 세화합전2길 31-1"
+   }
+  ]
+ },
+ {
+  "date": "2026/10/27",
+  "wd": 2,
+  "zones": [
+   "牛島"
+  ],
+  "warn": "當天看天氣決定入島日期",
+  "items": [
+   {
+    "cat": "island",
+    "title": "城山港搭渡輪",
+    "kr": "성산항종합여객터미널",
+    "nav": {
+     "q": "성산항종합여객터미널"
+    }
+   },
+   {
+    "cat": "island",
+    "title": "牛島",
+    "kr": "우도",
+    "nav": {
+     "q": "우도"
+    }
+   },
+   {
+    "cat": "sight",
+    "title": "城山日出峰",
+    "kr": "성산일출봉",
+    "nav": {
+     "lat": 33.458056,
+     "lng": 126.9425,
+     "kr": "성산일출봉"
+    }
+   },
+   {
+    "cat": "sight",
+    "title": "涉地可支",
+    "kr": "섭지코지",
+    "nav": {
+     "q": "섭지코지"
+    }
+   }
+  ]
+ },
+ {
+  "date": "2026/10/28",
+  "wd": 3,
+  "zones": [
+   "東北部"
+  ],
+  "items": [
+   {
+    "cat": "beach",
+    "title": "杏源海灘（柯南海灘）",
+    "kr": "행원해변(코난해변)",
+    "nav": {
+     "lat": 33.5575318,
+     "lng": 126.8112241,
+     "kr": "행원해변(코난해변)"
+    }
+   },
+   {
+    "cat": "beach",
+    "title": "金寧海邊",
+    "kr": "김녕해변 바닷길",
+    "nav": {
+     "lat": 33.5578652,
+     "lng": 126.7488633,
+     "kr": "김녕해변 바닷길"
+    }
+   },
+   {
+    "cat": "cave",
+    "title": "萬丈窟",
+    "kr": "만장굴",
+    "note": "室內，下雨也能走",
+    "rain": true,
+    "nav": {
+     "lat": 33.5281972,
+     "lng": 126.7717618,
+     "kr": "만장굴"
+    }
+   },
+   {
+    "cat": "lunch",
+    "title": "濟州韓麵家",
+    "kr": "제주한면가",
+    "dish": "豬肉湯麵",
+    "hours": "10:30–15:30",
+    "nav": {
+     "lat": 33.5120324,
+     "lng": 126.7000256,
+     "kr": "제주한면가"
+    }
+   },
+   {
+    "cat": "cafe",
+    "title": "so much more",
+    "kr": "so much more",
+    "closed": 2,
+    "nav": {
+     "lat": 33.5503288,
+     "lng": 126.6948041,
+     "kr": "so much more"
+    }
+   },
+   {
+    "cat": "beach",
+    "title": "咸德海灘",
+    "kr": "함덕해수욕장",
+    "nav": {
+     "lat": 33.5434231,
+     "lng": 126.6697752,
+     "kr": "함덕해수욕장"
+    }
+   },
+   {
+    "cat": "dinner",
+    "title": "季節食卓 咸德店",
+    "kr": "계절식탁 함덕점",
+    "dish": "海鮮生魚片（鯖魚、蝦）",
+    "tags": [
+     "預約"
+    ],
+    "nav": {
+     "lat": 33.5425961,
+     "lng": 126.6674297,
+     "kr": "계절식탁 함덕점"
+    }
+   }
+  ]
+ },
+ {
+  "date": "2026/10/29",
+  "wd": 4,
+  "zones": [
+   "市區",
+   "東部"
+  ],
+  "items": [
+   {
+    "cat": "checkout",
+    "title": "11:00 退房"
+   },
+   {
+    "cat": "foliage",
+    "title": "濟州大學 銀杏大道",
+    "kr": "제주대학교 은행나무길",
+    "note": "賞銀杏",
+    "nav": {
+     "lat": 33.4585903,
+     "lng": 126.5572137,
+     "kr": "제주대학교 은행나무길"
+    }
+   },
+   {
+    "cat": "lunch",
+    "title": "DOTOREE Kitchen",
+    "kr": "도토리키친 본점",
+    "dish": "橘子蕎麥麵",
+    "tags": [
+     "預約"
+    ],
+    "hours": "10:30–17:00",
+    "nav": {
+     "lat": 33.5153877,
+     "lng": 126.5186172,
+     "kr": "도토리키친 본점"
+    }
+   },
+   {
+    "cat": "shop",
+    "title": "市區",
+    "note": "最後採買"
+   },
+   {
+    "cat": "flight",
+    "title": "班機 LJ941",
+    "note": "返回台中"
+   }
+  ]
+ }
+];
 const PLACES = [
-{"id": 1, "name": "Beryl", "name_kr": "베릴", "lat": 33.3975848, "lng": 126.2425697, "cat": "cafe", "area": "翰林·挾才", "desc": "挾才海邊的海景咖啡廳，店家標示為 no kids zone。", "note": "海景咖啡廳", "gmaps": "https://www.google.com/maps/place/Beryl/data=!4m2!3m1!1s0x350c61af7db1848b:0x9d67c543f09a5b29"},
-{"id": 2, "name": "늘보의 작업실", "name_kr": "늘보의 작업실", "lat": 33.4959396, "lng": 126.8998255, "cat": "food", "area": "舊左·終達里", "desc": "終達里的義式早午餐小館，也供應紅酒。", "note": "", "gmaps": "https://www.google.com/maps/place/%EB%8A%98%EB%B3%B4%EC%9D%98+%EC%9E%91%EC%97%85%EC%8B%A4/data=!4m2!3m1!1s0x350d15d7fe23ebb9:0xeb137f484558cf5c"},
-{"id": 3, "name": "가는곶 세화", "name_kr": "가는곶 세화", "lat": 33.5205393, "lng": 126.8606225, "cat": "cafe", "area": "舊左·細花", "desc": "細花海邊的石屋咖啡廳，氣氛安靜。", "note": "", "gmaps": "https://www.google.com/maps/place/%EA%B0%80%EB%8A%94%EA%B3%B6+%EC%84%B8%ED%99%94/data=!4m2!3m1!1s0x350d179ff0a7a4b5:0xd6a66cb5fade59e3"},
-{"id": 4, "name": "여정", "name_kr": "여정", "lat": 33.4945631, "lng": 126.5452162, "cat": "food", "area": "濟州市·二徒洞", "desc": "平價私廚風韓式料理，需事先預訂。", "note": "平價私廚類 要先預訂", "gmaps": "https://www.google.com/maps/place/%EC%97%AC%EC%A0%95/data=!4m2!3m1!1s0x350cfd006a919bdf:0x96b19d38ad6241be"},
-{"id": 5, "name": "丈母食卓", "name_kr": "장모식탁", "lat": 33.4971067, "lng": 126.546788, "cat": "food", "area": "濟州市·蓮信路", "desc": "家常韓食小店，推薦直接點套餐。", "note": "推套餐", "gmaps": "https://www.google.com/maps/place/%E4%B8%88%E6%AF%8D%E9%A3%9F%E5%8D%93/data=!4m2!3m1!1s0x350cfcc98099c5db:0x599f9624485fd2a0"},
-{"id": 6, "name": "Café Delmoondo", "name_kr": "델문도", "lat": 33.5437787, "lng": 126.6688353, "cat": "cafe", "area": "朝天·咸德", "desc": "咸德海邊的人氣咖啡烘焙館，坐位面海。", "note": "", "gmaps": "https://www.google.com/maps/place/Caf%C3%A9+Delmoondo/data=!4m2!3m1!1s0x350d1e9961b5bd7f:0xe16f5406dbb863a4"},
-{"id": 7, "name": "생원전복", "name_kr": "생원전복", "lat": 33.2458179, "lng": 126.3307228, "cat": "food", "area": "安德·和順", "desc": "鮑魚專門店，招牌是鮑魚石鍋拌飯。", "note": "鮑魚石鍋拌飯", "gmaps": "https://www.google.com/maps/place/%EC%83%9D%EC%9B%90%EC%A0%84%EB%B3%B5/data=!4m2!3m1!1s0x350c43404c90de1f:0xbf9413ca7cfd9fe4"},
-{"id": 8, "name": "Nogorok", "name_kr": "노고록", "lat": 33.2524181, "lng": 126.4266798, "cat": "food", "area": "西歸浦·天帝淵", "desc": "韓食小館，口碑很好，建議一開店就到。", "note": "聽說是最好吃 要一開店就去", "gmaps": "https://www.google.com/maps/place/Nogorok/data=!4m2!3m1!1s0x350c5b001d98b959:0x146dbb4434b50966"},
-{"id": 9, "name": "DOTOREE Kitchen", "name_kr": "도토리키친 본점", "lat": 33.5153877, "lng": 126.5186172, "cat": "food", "area": "濟州市·北城路", "desc": "人氣早午餐與麵食店，建議先用 CatchTable 訂位。", "note": "建議先用CatchTable預約", "gmaps": "https://www.google.com/maps/place/DOTOREE+Kitchen/data=!4m2!3m1!1s0x350d1b69963f852f:0xf01e7f2c95267210"},
-{"id": 10, "name": "豚魚吉", "name_kr": "돈어길", "lat": 33.28076, "lng": 126.2854572, "cat": "food", "area": "大靜·中山間", "desc": "黑豬肉燒烤與冷麵專門店。", "note": "", "gmaps": "https://www.google.com/maps/place/%E8%B1%9A%E9%AD%9A%E5%90%89/data=!4m2!3m1!1s0x350c5db490ee2cdb:0x88a2f71838b4064"},
-{"id": 11, "name": "靑草水水拌生魚片 濟州店", "name_kr": "청초수물회 제주점", "lat": 33.4566582, "lng": 126.3091233, "cat": "food", "area": "涯月", "desc": "水拌生魚片名店，鮑魚粥也受歡迎。", "note": "鮑魚粥", "gmaps": "https://www.google.com/maps/place/%E9%9D%91%E8%8D%89%E6%B0%B4%E6%B0%B4%E6%8B%8C%E7%94%9F%E9%AD%9A%E7%89%87+%E6%BF%9F%E5%B7%9E%E5%BA%97/data=!4m2!3m1!1s0x350cf5207b32f2af:0x1a62d4e02cafe156"},
-{"id": 12, "name": "Jeomjeom", "name_kr": "점점", "lat": 33.537233, "lng": 126.6153298, "cat": "cafe", "area": "朝天·新村里", "desc": "新村里海邊的安靜咖啡廳。", "note": "", "gmaps": "https://www.google.com/maps/place/Jeomjeom/data=!4m2!3m1!1s0x350d1d8148987c97:0xde6c20a901d7d411"},
-{"id": 13, "name": "Shinjeju Bomal Kalguksu", "name_kr": "신제주보말칼국수 제주본점", "lat": 33.4879343, "lng": 126.500021, "cat": "food", "area": "濟州市·新濟州", "desc": "海螺刀削麵本店。", "note": "海螺刀削麵", "gmaps": "https://www.google.com/maps/place/Shinjeju+Bomal+Kalguksu/data=!4m2!3m1!1s0x350cfb0d429c8993:0xcfeb2825f3149841"},
-{"id": 14, "name": "島豚 挾才黑豬肉", "name_kr": "도돈 협재흑돼지", "lat": 33.3947961, "lng": 126.2415901, "cat": "food", "area": "翰林·挾才", "desc": "挾才的黑豬肉炭火燒烤。", "note": "", "gmaps": "https://www.google.com/maps/place/%E5%B3%B6%E8%B1%9A+%E6%8C%BE%E6%89%8D%E9%BB%91%E8%B1%AC%E8%82%89/data=!4m2!3m1!1s0x350c610029f6fc0b:0x6c3be7f135145ec6"},
-{"id": 15, "name": "Haehwatang", "name_kr": "해화탕", "lat": 33.4433921, "lng": 126.2915933, "cat": "cafe", "area": "翰林·一周西路", "desc": "翰林一帶的咖啡廳。", "note": "", "gmaps": "https://www.google.com/maps/place/Haehwatang/data=!4m2!3m1!1s0x350cf500514505a1:0xd9457e0af0a94965"},
-{"id": 16, "name": "오드리 김밥", "name_kr": "오드리 김밥", "lat": 33.4631382, "lng": 126.9334513, "cat": "food", "area": "城山", "desc": "城山日出峰附近的紫菜飯捲店，適合外帶。", "note": "", "gmaps": "https://www.google.com/maps/place/%EC%98%A4%EB%93%9C%EB%A6%AC+%EA%B9%80%EB%B0%A5/data=!4m2!3m1!1s0x350d15a1c3203a7b:0xc76a6e6d63217053"},
-{"id": 17, "name": "Gogugsu", "name_kr": "고국수", "lat": 33.5064195, "lng": 126.509232, "cat": "food", "area": "濟州市·龍門路", "desc": "麵食店，早上 10 點前才供應帶魚湯麵。", "note": "早上10點前供應帶魚湯麵", "gmaps": "https://www.google.com/maps/place/Gogugsu/data=!4m2!3m1!1s0x350cfb4f0971075f:0xd10cb09e663a435e"},
-{"id": 18, "name": "무상찻집", "name_kr": "무상찻집", "lat": 33.5009806, "lng": 126.5144369, "cat": "cafe", "area": "濟州市·西光路", "desc": "安靜的傳統茶館。", "note": "", "gmaps": "https://www.google.com/maps/place/%EB%AC%B4%EC%83%81%EC%B0%BB%EC%A7%91/data=!4m2!3m1!1s0x350cfb29abc600ab:0xcbe286207cde115"},
-{"id": 19, "name": "季節食卓 咸德店", "name_kr": "계절식탁 함덕점", "lat": 33.5425961, "lng": 126.6674297, "cat": "food", "area": "朝天·咸德", "desc": "咸德海邊二樓的韓式定食。", "note": "", "gmaps": "https://www.google.com/maps/place/%E5%AD%A3%E7%AF%80%E9%A3%9F%E5%8D%93+%E5%92%B8%E5%BE%B7%E5%BA%97/data=!4m2!3m1!1s0x350d1f1f715a326d:0x2891ca25b75d29df"},
-{"id": 20, "name": "Ppolsaljip", "name_kr": "뽈살집", "lat": 33.2508339, "lng": 126.5628867, "cat": "food", "area": "西歸浦·中央洞", "desc": "豬頰肉燒烤店。", "note": "", "gmaps": "https://www.google.com/maps/place/Ppolsaljip/data=!4m2!3m1!1s0x350c539c55c10f71:0x3295985b068bb521"},
-{"id": 21, "name": "Iltong Iban", "name_kr": "일통이반", "lat": 33.5170648, "lng": 126.5221484, "cat": "food", "area": "濟州市·中央路", "desc": "市區的海鮮料理店。", "note": "", "gmaps": "https://www.google.com/maps/place/Iltong+Iban/data=!4m2!3m1!1s0x350ce4a9d5e14011:0x2025d5df2e52287f"},
-{"id": 22, "name": "熟成到 涯月店", "name_kr": "숙성도 애월점", "lat": 33.463515, "lng": 126.3096504, "cat": "food", "area": "涯月", "desc": "熟成黑豬肉名店的涯月分店。", "note": "", "gmaps": "https://www.google.com/maps/place/%E7%86%9F%E6%88%90%E5%88%B0+%E6%B6%AF%E6%9C%88%E5%BA%97/data=!4m2!3m1!1s0x350cf5376a720e8b:0xb3812aa6ac650454"},
-{"id": 23, "name": "Floyeast Bakery Cafe", "name_kr": "플로이스트 베이커리 카페", "lat": 33.4291562, "lng": 126.9338099, "cat": "cafe", "area": "城山·古城里", "desc": "城山的烘焙咖啡館。", "note": "", "gmaps": "https://www.google.com/maps/place/Floyeast+Bakery+Cafe/data=!4m2!3m1!1s0x350d130006ad457f:0x6e905e0a24cbac63"},
-{"id": 24, "name": "Cafe Out Of Ordinary", "name_kr": "카페 아오오", "lat": 33.3791372, "lng": 126.8799189, "cat": "cafe", "area": "城山·環海長城路", "desc": "面海的景觀咖啡廳。", "note": "", "gmaps": "https://www.google.com/maps/place/Cafe+Out+Of+Ordinary/data=!4m2!3m1!1s0x350d13973971b137:0xb443b7e31a57491b"},
-{"id": 25, "name": "고결 고등어숯불반상", "name_kr": "고결 고등어숯불반상", "lat": 33.2068097, "lng": 126.2899923, "cat": "food", "area": "大靜·兄弟海岸", "desc": "炭烤鯖魚定食，二樓看得到兄弟島。", "note": "", "gmaps": "https://www.google.com/maps/place/%EA%B3%A0%EA%B2%B0+%EA%B3%A0%EB%93%B1%EC%96%B4%EC%88%AF%EB%B6%88%EB%B0%98%EC%83%81/data=!4m2!3m1!1s0x350c439205c7a713:0x98a415c26a3cb0ac"},
-{"id": 26, "name": "老奶奶的年糕", "name_kr": "할머니떡집", "lat": 33.2486024, "lng": 126.5642223, "cat": "cafe", "area": "西歸浦·西歸洞", "desc": "老字號年糕店。", "note": "", "gmaps": "https://www.google.com/maps/place/%E8%80%81%E5%A5%B6%E5%A5%B6%E7%9A%84%E5%B9%B4%E7%B3%95/data=!4m2!3m1!1s0x350c539dc531ebef:0xb9d609457f494057"},
-{"id": 27, "name": "麵條海洋 本店", "name_kr": "국수바다 본점", "lat": 33.253023, "lng": 126.447197, "cat": "food", "area": "西歸浦·一周西路", "desc": "豬肉湯麵老店。", "note": "", "gmaps": "https://www.google.com/maps/place/%E9%BA%B5%E6%A2%9D%E6%B5%B7%E6%B4%8B+%E6%9C%AC%E5%BA%97/data=!4m2!3m1!1s0x350c5a97de6bc439:0xd72da3c9bd9b38fa"},
-{"id": 28, "name": "Miyoung's Sashimi", "name_kr": "미영이네", "lat": 33.2177388, "lng": 126.2498932, "cat": "food", "area": "大靜·摹瑟浦", "desc": "生魚片與水拌生魚片名店。", "note": "", "gmaps": "https://www.google.com/maps/place/Miyoung's+Sashimi/data=!4m2!3m1!1s0x350c69f72c653503:0x735a1423dfdddac2"},
-{"id": 29, "name": "兄弟島海螺刀切麵", "name_kr": "형제섬보말칼국수", "lat": 33.2069012, "lng": 126.2902768, "cat": "food", "area": "大靜·兄弟海岸", "desc": "面對兄弟島的海螺刀削麵店。", "note": "", "gmaps": "https://www.google.com/maps/place/%E5%85%84%E5%BC%9F%E5%B3%B6%E6%B5%B7%E8%9E%BA%E5%88%80%E5%88%87%E9%BA%B5/data=!4m2!3m1!1s0x350c423bba5f6739:0x59e837b9cca35040"},
-{"id": 30, "name": "Tongbal", "name_kr": "통발", "lat": 33.4609516, "lng": 126.9341431, "cat": "food", "area": "城山·日出路", "desc": "城山的居酒屋。", "note": "", "gmaps": "https://www.google.com/maps/place/Tongbal/data=!4m2!3m1!1s0x350d152b174b98b9:0xed1678ef1c86571c"},
-{"id": 31, "name": "도토리 제주점", "name_kr": "도토리 제주점", "lat": 33.4632162, "lng": 126.3097137, "cat": "cafe", "area": "涯月", "desc": "涯月的人氣麵包店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EB%8F%84%ED%86%A0%EB%A6%AC+%EC%A0%9C%EC%A3%BC%EC%A0%90/data=!4m2!3m1!1s0x350cf50047202a4f:0xeae3b0fa977a0b45"},
-{"id": 32, "name": "Sogeumbachi Sooninae", "name_kr": "소금바치 순이네", "lat": 33.5035471, "lng": 126.9127463, "cat": "food", "area": "舊左·終達里", "desc": "海女風海鮮家常菜。", "note": "", "gmaps": "https://www.google.com/maps/place/Sogeumbachi+Sooninae/data=!4m2!3m1!1s0x350d150846ae2559:0xd6c53d0e7b976bfd"},
-{"id": 33, "name": "月高家 黑豬肉", "name_kr": "월고집 월정리고기집", "lat": 33.5533544, "lng": 126.7911073, "cat": "food", "area": "舊左·月汀里", "desc": "月汀里的黑豬肉燒烤店。", "note": "", "gmaps": "https://www.google.com/maps/place/%E6%9C%88%E9%AB%98%E5%AE%B6+%E9%BB%91%E8%B1%AC%E8%82%89/data=!4m2!3m1!1s0x350d172adde62f3d:0x60b565d5001399c4"},
-{"id": 34, "name": "바담깨비애월회관", "name_kr": "바담깨비애월회관", "lat": 33.4838162, "lng": 126.3956061, "cat": "food", "area": "涯月·海岸路", "desc": "涯月海岸路上的海鮮餐廳。", "note": "", "gmaps": "https://www.google.com/maps/place/%EB%B0%94%EB%8B%B4%EA%B9%A8%EB%B9%84%EC%95%A0%EC%9B%94%ED%9A%8C%EA%B4%80/data=!4m2!3m1!1s0x350cf1de0822f097:0x421b901eb106f12b"},
-{"id": 35, "name": "Blanc Rocher", "name_kr": "블랑로쉐", "lat": 33.5156863, "lng": 126.9580858, "cat": "cafe", "area": "牛島", "desc": "牛島上的咖啡廳。", "note": "", "gmaps": "https://www.google.com/maps/place/Blanc+Rocher/data=!4m2!3m1!1s0x350d4001de8a55a5:0x4407664131cf52d7"},
-{"id": 36, "name": "Modern Dombe", "name_kr": "모던돔베 공항본점", "lat": 33.4570687, "lng": 126.4860197, "cat": "food", "area": "濟州市·機場旁", "desc": "돔베고기與麵食，離機場近。", "note": "", "gmaps": "https://www.google.com/maps/place/Modern+Dombe/data=!4m2!3m1!1s0x350cfbe9b32dd343:0x15786c0e93a18cda"},
-{"id": 37, "name": "Coffee Temple Jeju", "name_kr": "커피템플", "lat": 33.4781416, "lng": 126.5702901, "cat": "cafe", "area": "濟州市·永坪", "desc": "濟州知名的精品咖啡烘豆店。", "note": "", "gmaps": "https://www.google.com/maps/place/Coffee+Temple+Jeju/data=!4m2!3m1!1s0x350cfd213f739b25:0xc42ea610142d6a43"},
-{"id": 38, "name": "Cafe Gyulkkot Darak", "name_kr": "귤꽃다락", "lat": 33.2464249, "lng": 126.5225977, "cat": "cafe", "area": "西歸浦·Ieodo路", "desc": "橘子園裡的咖啡廳。", "note": "", "gmaps": "https://www.google.com/maps/place/Cafe+Gyulkkot+Darak/data=!4m2!3m1!1s0x357b5b5937c887d1:0x49c86381b28349ab"},
-{"id": 39, "name": "Your Rice Cake", "name_kr": "유라케", "lat": 33.5073504, "lng": 126.504776, "cat": "cafe", "area": "濟州市·龍海路", "desc": "手作年糕甜點店。", "note": "", "gmaps": "https://www.google.com/maps/place/Your+Rice+Cake/data=!4m2!3m1!1s0x350cfb414d7ed325:0x958c808949701aeb"},
-{"id": 40, "name": "태광식당", "name_kr": "태광식당", "lat": 33.5126649, "lng": 126.5186913, "cat": "food", "area": "濟州市·塔洞", "desc": "塔洞路上的老式食堂。", "note": "", "gmaps": "https://www.google.com/maps/place/%ED%83%9C%EA%B4%91%EC%8B%9D%EB%8B%B9/data=!4m2!3m1!1s0x350ce4ab6b263a73:0x4971547aec5bc188"},
-{"id": 41, "name": "London Bagel Museum Jeju", "name_kr": "런던베이글뮤지엄 제주점", "lat": 33.5535978, "lng": 126.7155939, "cat": "cafe", "area": "舊左·東福里", "desc": "人氣貝果店的濟州分店，常需排隊。", "note": "", "gmaps": "https://www.google.com/maps/place/London+Bagel+Museum+Jeju/data=!4m2!3m1!1s0x350d1970b7a01c3b:0x9522d57871ef1c43"},
-{"id": 42, "name": "濟州韓麵家", "name_kr": "제주한면가", "lat": 33.5120324, "lng": 126.7000256, "cat": "food", "area": "朝天·北宣路", "desc": "韓式麵食，豆豆飯飯值得點。", "note": "豆豆飯飯推薦", "gmaps": "https://www.google.com/maps/place/%E6%BF%9F%E5%B7%9E%E9%9F%93%E9%BA%B5%E5%AE%B6/data=!4m2!3m1!1s0x350d1bf419149e6b:0x92e96aec5a2fb688"},
-{"id": 43, "name": "Kkotdwaeji Grill", "name_kr": "꽃돼지 연탄 구이", "lat": 33.242032, "lng": 126.4439877, "cat": "food", "area": "西歸浦·大浦洞", "desc": "煤炭火烤豬肉。", "note": "", "gmaps": "https://www.google.com/maps/place/Kkotdwaeji+Grill/data=!4m2!3m1!1s0x350c500c50bbecd1:0x583650d5775fd1c2"},
-{"id": 44, "name": "so much more", "name_kr": "so much more", "lat": 33.5503288, "lng": 126.6948041, "cat": "cafe", "area": "朝天·北村", "desc": "北村的咖啡廳。", "note": "", "gmaps": "https://www.google.com/maps/place/so+much+more/data=!4m2!3m1!1s0x350d1f004af53b87:0x7a76b48c79db3b31"},
-{"id": 45, "name": "Udo Sand", "name_kr": "우도샌드", "lat": 33.5162432, "lng": 126.9576266, "cat": "cafe", "area": "牛島", "desc": "牛島的甜點店。", "note": "", "gmaps": "https://www.google.com/maps/place/Udo+Sand/data=!4m2!3m1!1s0x350d410b354c9e39:0x55cc314b08679240"},
-{"id": 46, "name": "Oleun", "name_kr": "오른", "lat": 33.4741667, "lng": 126.9111111, "cat": "cafe", "area": "城山·迎日海岸路", "desc": "海邊的景觀咖啡廳。", "note": "", "gmaps": "https://www.google.com/maps/place/Oleun/data=!4m2!3m1!1s0x350d150051d5a409:0xc19375fa183ba71b"},
-{"id": 47, "name": "엉클프레즐하우스", "name_kr": "엉클프레즐하우스", "lat": 33.5413678, "lng": 126.6742925, "cat": "cafe", "area": "朝天·咸德", "desc": "手作扭結餅專賣店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EC%97%89%ED%81%B4%ED%94%84%EB%A0%88%EC%A6%90%ED%95%98%EC%9A%B0%EC%8A%A4/data=!4m2!3m1!1s0x350d1f9d1c09edb1:0xb6d6db4faae22596"},
-{"id": 48, "name": "駱駝咖啡 濟州店", "name_kr": "카멜커피 제주점", "lat": 33.5568768, "lng": 126.8098896, "cat": "cafe", "area": "舊左·杏源", "desc": "人氣카멜커피的濟州海景店。", "note": "", "gmaps": "https://www.google.com/maps/place/%E9%A7%B1%E9%A7%9D%E5%92%96%E5%95%A1+%E6%BF%9F%E5%B7%9E%E5%BA%97/data=!4m2!3m1!1s0x350d17001bae2799:0xcc709688d6b7c59b"},
-{"id": 49, "name": "Daily Stitch", "name_kr": "dailystitch", "lat": 33.5419995, "lng": 126.6640605, "cat": "shop", "area": "朝天·咸德", "desc": "咸德的刺繡雜貨小店。", "note": "", "gmaps": "https://www.google.com/maps/place/Daily+Stitch/data=!4m2!3m1!1s0x350ce2e67191f38b:0x61a1dca91586c753"},
-{"id": 50, "name": "沙溪海岸", "name_kr": "사계해안", "lat": 33.2231459, "lng": 126.297477, "cat": "spot", "area": "安德·沙溪", "desc": "可遠望兄弟島與山房山的黑沙海岸。", "note": "", "gmaps": "https://www.google.com/maps/place/%E6%B2%99%E6%BA%AA%E6%B5%B7%E5%B2%B8/data=!4m2!3m1!1s0x350c43dfaeea13c3:0x2546acd773084eed"},
-{"id": 51, "name": "Ttarabi Oreum", "name_kr": "따라비오름", "lat": 33.3870582, "lng": 126.7534582, "cat": "spot", "area": "表善·加時里", "desc": "有「오름女王」之稱的火山丘，來回步行約一小時。", "note": "步行總路程1小時內", "gmaps": "https://www.google.com/maps/place/Ttarabi+Oreum/data=!4m2!3m1!1s0x350d05a4217b2df3:0x473a94e5433f79b5"},
-{"id": 52, "name": "D&DEPARTMENT JEJU by ARARIO", "name_kr": "디앤디파트먼트 제주 바이 아라리오", "lat": 33.5176855, "lng": 126.5234639, "cat": "shop", "area": "濟州市·塔洞", "desc": "主打濟州在地設計的生活選物店。", "note": "", "gmaps": "https://www.google.com/maps/place/D%26DEPARTMENT+JEJU+by+ARARIO/data=!4m2!3m1!1s0x350ce399db600891:0x26e2db239c7f35c2"},
-{"id": 53, "name": "挾才海水浴場", "name_kr": "협재해수욕장", "lat": 33.3942945, "lng": 126.2398813, "cat": "spot", "area": "翰林·挾才", "desc": "看得到飛揚島的翡翠色沙灘。", "note": "", "gmaps": "https://www.google.com/maps/place/%E6%8C%BE%E6%89%8D%E6%B5%B7%E6%B0%B4%E6%B5%B4%E5%A0%B4/data=!4m2!3m1!1s0x350c6100c373b0f1:0x6ce2ce2c47a28400"},
-{"id": 54, "name": "1100高地 休憩所", "name_kr": "1100고지 휴게소", "lat": 33.3577959, "lng": 126.4624949, "cat": "spot", "area": "西歸浦·穡達洞", "desc": "1100 公路最高點的休息站與濕地，秋天賞楓。", "note": "楓葉🍁", "gmaps": "https://www.google.com/maps/place/1100%E9%AB%98%E5%9C%B0+%E4%BC%91%E6%86%A9%E6%89%80/data=!4m2!3m1!1s0x350c57c0decbb733:0xd9bf1dcb826c5b1a"},
-{"id": 55, "name": "고내리 바닷길 포토스팟", "name_kr": "고내리 바닷길 포토스팟", "lat": 33.4666262, "lng": 126.3346484, "cat": "spot", "area": "涯月·高內里", "desc": "高內里海邊小路的熱門拍照點。", "note": "", "gmaps": "https://www.google.com/maps/place/%EA%B3%A0%EB%82%B4%EB%A6%AC+%EB%B0%94%EB%8B%B7%EA%B8%B8+%ED%8F%AC%ED%86%A0%EC%8A%A4%ED%8C%9F/data=!4m2!3m1!1s0x350cf50032a45cdf:0x5dca902b7ffde8ef"},
-{"id": 56, "name": "Leude", "name_kr": "르데", "lat": 33.2489465, "lng": 126.3220571, "cat": "shop", "area": "安德·沙溪", "desc": "沙溪的選物與禮品店。", "note": "", "gmaps": "https://www.google.com/maps/place/Leude/data=!4m2!3m1!1s0x350c430014d195f3:0x37e88db1ffd1a678"},
-{"id": 57, "name": "Artbox Jeju Yeondong", "name_kr": "아트박스 제주연동점", "lat": 33.4877006, "lng": 126.4910151, "cat": "shop", "area": "濟州市·蓮洞", "desc": "韓國連鎖文具雜貨店。", "note": "", "gmaps": "https://www.google.com/maps/place/Artbox+Jeju+Yeondong/data=!4m2!3m1!1s0x350cfb6ebcdb0409:0x5acd06b226d785fb"},
-{"id": 58, "name": "新川牧場", "name_kr": "신천목장", "lat": 33.3567015, "lng": 126.8682182, "cat": "spot", "area": "城山·新豐里", "desc": "海邊的廣闊牧草地，冬天會鋪滿橘皮。", "note": "", "gmaps": "https://www.google.com/maps/place/%E6%96%B0%E5%B7%9D%E7%89%A7%E5%A0%B4/data=!4m2!3m1!1s0x350d0e8e7c78eea1:0xc6f96777dfd33086"},
-{"id": 59, "name": "Bigpokes", "name_kr": "빅포켓", "lat": 33.5129348, "lng": 126.5214933, "cat": "shop", "area": "濟州市·觀德路", "desc": "市區的雜貨禮品店。", "note": "", "gmaps": "https://www.google.com/maps/place/Bigpokes/data=!4m2!3m1!1s0x350ce589ed15ff97:0xb3f8a7f607405cb8"},
-{"id": 60, "name": "Hamdeok Beach", "name_kr": "함덕해수욕장", "lat": 33.5434231, "lng": 126.6697752, "cat": "spot", "area": "朝天·咸德", "desc": "濟州最有名的碧綠色海水浴場。", "note": "", "gmaps": "https://www.google.com/maps/place/Hamdeok+Beach/data=!4m2!3m1!1s0x350cfcafaaf72b55:0xf0d2596ca578b870"},
-{"id": 61, "name": "Heisan Jeju Flagship Store", "name_kr": "헤이산 제주", "lat": 33.463027, "lng": 126.3097897, "cat": "shop", "area": "涯月", "desc": "服飾品牌的涯月旗艦店。", "note": "", "gmaps": "https://www.google.com/maps/place/Heisan+Jeju+Flagship+Store/data=!4m2!3m1!1s0x350cf5440de1b0bf:0x68e1c1531b138e33"},
-{"id": 62, "name": "수풀 제주 스토어", "name_kr": "수풀 제주 스토어", "lat": 33.4179013, "lng": 126.2666193, "cat": "shop", "area": "翰林·翰水浦路", "desc": "設計家飾選物店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EC%88%98%ED%92%80+%EC%A0%9C%EC%A3%BC+%EC%8A%A4%ED%86%A0%EC%96%B4/data=!4m2!3m1!1s0x350c5f9dadce38e9:0xeba87f2d520f9225"},
-{"id": 63, "name": "Lu-Inhom", "name_kr": "루인홈", "lat": 33.5029546, "lng": 126.6942576, "cat": "shop", "area": "朝天·中山間東路", "desc": "禮品雜貨店。", "note": "", "gmaps": "https://www.google.com/maps/place/Lu-Inhom/data=!4m2!3m1!1s0x350d1d4bb667516d:0xc71079bddf7f61c6"},
-{"id": 64, "name": "Mulyohi", "name_kr": "무료히", "lat": 33.5100889, "lng": 126.5235413, "cat": "shop", "area": "濟州市·三徒二洞", "desc": "市區巷內的雜貨小舖。", "note": "", "gmaps": "https://www.google.com/maps/place/Mulyohi/data=!4m2!3m1!1s0x350ce3003be93445:0xd7f0ce24ff7373cb"},
-{"id": 65, "name": "hetras Jeju", "name_kr": "헤트라스 제주", "lat": 33.4901546, "lng": 126.4899427, "cat": "shop", "area": "濟州市·新光路", "desc": "美妝保養品店。", "note": "", "gmaps": "https://www.google.com/maps/place/hetras+Jeju/data=!4m2!3m1!1s0x350cfb3099c6ddc1:0xa1f4452f935524b0"},
-{"id": 66, "name": "8 Gwandeok-ro 選物店", "name_kr": "관덕로 8", "lat": 33.5127489, "lng": 126.5202265, "cat": "shop", "area": "濟州市·觀德路", "desc": "觀德路 8 號的選物店。", "note": "選物店", "gmaps": "https://www.google.com/maps/place/8+Gwandeok-ro/data=!4m2!3m1!1s0x350ce4aafd8173ad:0x3203785115d0afcb"},
-{"id": 67, "name": "MyLittleJinji", "name_kr": "마이리틀진지", "lat": 33.5029707, "lng": 126.463959, "cat": "shop", "area": "濟州市·道頭洞", "desc": "飾品與時尚小店。", "note": "", "gmaps": "https://www.google.com/maps/place/MyLittleJinji+%EB%A7%88%EC%9D%B4%EB%A6%AC%ED%8B%80%EC%A7%84%EC%A7%80/data=!4m2!3m1!1s0x350cfb214507905f:0x8ebfce50ae5d1317"},
-{"id": 68, "name": "엠와이제주", "name_kr": "엠와이제주", "lat": 33.4901323, "lng": 126.4905208, "cat": "shop", "area": "濟州市·三無路", "desc": "禮品雜貨店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EC%97%A0%EC%99%80%EC%9D%B4%EC%A0%9C%EC%A3%BC/data=!4m2!3m1!1s0x350cfb003cd30045:0xa0537b2852d3c049"},
-{"id": 69, "name": "Assisi 濟州香水", "name_kr": "애월 아시시", "lat": 33.4778079, "lng": 126.3550408, "cat": "shop", "area": "涯月·海岸路", "desc": "香氛品牌店，可做濟州主題香水。", "note": "濟州香水", "gmaps": "https://www.google.com/maps/place/Assisi/data=!4m2!3m1!1s0x350cf7c18e7666c3:0x715e67b4e43f267f"},
-{"id": 70, "name": "탱글 (소품샵)", "name_kr": "탱글", "lat": 33.4656631, "lng": 126.3200485, "cat": "shop", "area": "涯月", "desc": "小物雜貨店。", "note": "", "gmaps": "https://www.google.com/maps/place/%ED%83%B1%EA%B8%80(%EC%86%8C%ED%92%88%EC%83%B5)/data=!4m2!3m1!1s0x350cf50043825c7b:0xb170e3182091e792"},
-{"id": 71, "name": "던스트 제주 플래그십 스토어", "name_kr": "던스트 제주 플래그십 스토어", "lat": 33.4625151, "lng": 126.3094702, "cat": "shop", "area": "涯月", "desc": "韓國服飾品牌 DUNST 的濟州旗艦店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EB%8D%98%EC%8A%A4%ED%8A%B8+%EC%A0%9C%EC%A3%BC+%ED%94%8C%EB%9E%98%EA%B7%B8%EC%8B%AD+%EC%8A%A4%ED%86%A0%EC%96%B4/data=!4m2!3m1!1s0x350cf50d2c2c2529:0x7a8beb91646ca44a"},
-{"id": 72, "name": "메르시제주 MERCI JEJU", "name_kr": "메르시제주", "lat": 33.5145824, "lng": 126.5129743, "cat": "shop", "area": "濟州市·龍頭岩路", "desc": "濟州伴手禮專賣店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EB%A9%94%EB%A5%B4%EC%8B%9C%EC%A0%9C%EC%A3%BC+%7C+%E6%BF%9F%E5%B7%9E%E5%B3%B6%E7%B4%80%E5%BF%B5%E5%93%81+%7C+%E6%BF%9F%E5%B7%9E%E5%B3%B6%E4%BC%B4%E6%89%8B%E7%A6%AE+%7C+MERCI+JEJU+SOUVENIR+SHOP+%7C/data=!4m2!3m1!1s0x350ce522dc44004d:0x2438ef51fd9e076d"},
-{"id": 73, "name": "甫木浦口階段", "name_kr": "보목포구계단", "lat": 33.2395268, "lng": 126.6073589, "cat": "spot", "area": "西歸浦·甫木", "desc": "海中階梯，退潮前後一小時才會露出。", "note": "要降朝前後一小時", "gmaps": "https://www.google.com/maps/place/%E7%94%AB%E6%9C%A8%E6%B5%A6%E5%8F%A3%E9%9A%8E%E6%AE%B5/data=!4m2!3m1!1s0x350c53005e934907:0xd24ce28e73edcfd0"},
-{"id": 74, "name": "세기알해변", "name_kr": "세기알해변", "lat": 33.558169, "lng": 126.7553943, "cat": "spot", "area": "舊左·金寧", "desc": "金寧一帶的小海灣，浮潛與潛水點。", "note": "", "gmaps": "https://www.google.com/maps/place/%EC%84%B8%EA%B8%B0%EC%95%8C%ED%95%B4%EB%B3%80/data=!4m2!3m1!1s0x350d19184f7d0061:0xfe15ecc10c2c6277"},
-{"id": 75, "name": "모아이 MOI", "name_kr": "모아이 MOI", "lat": 33.5129041, "lng": 126.5344251, "cat": "shop", "area": "濟州市·東門路", "desc": "禮品選物店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EB%AA%A8%EC%95%84%EC%9D%B4+MOI/data=!4m2!3m1!1s0x350ce337975caadf:0x8f28911a5c85cb09"},
-{"id": 76, "name": "城山日出峰", "name_kr": "성산일출봉", "lat": 33.458056, "lng": 126.9425, "cat": "spot", "area": "城山", "desc": "UNESCO 世界自然遺產的火山口，看日出的名所。", "note": "", "gmaps": "https://www.google.com/maps/place/%E5%9F%8E%E5%B1%B1%E6%97%A5%E5%87%BA%E5%B3%B0/data=!4m2!3m1!1s0x350d14b9f6e3789f:0x555132053a23b64b"},
-{"id": 77, "name": "龍頭海岸", "name_kr": "용머리해안", "lat": 33.2316155, "lng": 126.3148321, "cat": "spot", "area": "安德·沙溪", "desc": "山房山下的層積岩海岸，會依潮位與天氣封閉。", "note": "", "gmaps": "https://www.google.com/maps/place/%E9%BE%8D%E9%A0%AD%E6%B5%B7%E5%B2%B8/data=!4m2!3m1!1s0x350c4307a770e15b:0x5f8461d229ddab28"},
-{"id": 78, "name": "O'sulloc Tea Museum", "name_kr": "오설록 티 뮤지엄", "lat": 33.3059385, "lng": 126.2894355, "cat": "spot", "area": "安德·神話歷史路", "desc": "綠茶園裡的 O'sulloc 茶博物館。", "note": "", "gmaps": "https://www.google.com/maps/place/%E3%82%AA%E3%82%BD%E3%83%AB%E3%83%AD%E3%83%83%E3%82%AF%E3%83%BB%E3%83%86%E3%82%A3%E3%83%BC%E3%83%BB%E3%83%9F%E3%83%A5%E3%83%BC%E3%82%B8%E3%82%A2%E3%83%A0/data=!4m2!3m1!1s0x350c5d1219ebcc11:0xb8a71289da43cad1"},
-{"id": 79, "name": "김녕해수욕장", "name_kr": "김녕해수욕장", "lat": 33.5582774, "lng": 126.759787, "cat": "spot", "area": "舊左·金寧", "desc": "水色清透的金寧海水浴場。", "note": "", "gmaps": "https://www.google.com/maps/place/%EA%B9%80%EB%85%95%ED%95%B4%EC%88%98%EC%9A%95%EC%9E%A5/data=!4m2!3m1!1s0x350d184767ce97e3:0x63f0205bf57e068f"},
-{"id": 80, "name": "aeae 제주점", "name_kr": "aeae 제주점", "lat": 33.5146606, "lng": 126.5264318, "cat": "shop", "area": "濟州市·觀德路", "desc": "女裝選物店。", "note": "", "gmaps": "https://www.google.com/maps/place/aeae+%EC%A0%9C%EC%A3%BC%EC%A0%90/data=!4m2!3m1!1s0x350ce3859622bef1:0xb56c08d61da85054"},
-{"id": 81, "name": "섬조각 somejogak", "name_kr": "섬조각", "lat": 33.5148942, "lng": 126.5273838, "cat": "shop", "area": "濟州市·中央路", "desc": "濟州風紀念品小店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EC%84%AC%EC%A1%B0%EA%B0%81+somejogak/data=!4m2!3m1!1s0x350ce339102c9b77:0xb3b53dae96e23a4a"},
-{"id": 82, "name": "오브젝트 제주점 Object Jeju", "name_kr": "오브젝트 제주점", "lat": 33.5533877, "lng": 126.7156758, "cat": "shop", "area": "舊左·東福里", "desc": "韓國文創雜貨 Object 的濟州店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EC%98%A4%EB%B8%8C%EC%A0%9D%ED%8A%B8+%EC%A0%9C%EC%A3%BC%EC%A0%90+Object+Jeju+Branch/data=!4m2!3m1!1s0x350d19001294129d:0xb018f43394d06bd5"},
-{"id": 83, "name": "金寧海邊 海岸路", "name_kr": "김녕해변 바닷길", "lat": 33.5578652, "lng": 126.7488633, "cat": "spot", "area": "舊左·金寧", "desc": "金寧海邊的海岸散步路。", "note": "", "gmaps": "https://www.google.com/maps/place/%E9%87%91%E5%AF%A7%E6%B5%B7%E9%82%8A+%E6%B5%B7%E5%B2%B8%E8%B7%AF/data=!4m2!3m1!1s0x350d19216549061f:0x38836d0a5826c23"},
-{"id": 84, "name": "濟州大學路 102 銀杏", "name_kr": "제주대학로 102", "lat": 33.4547583, "lng": 126.5622562, "cat": "spot", "area": "濟州市·我羅洞", "desc": "濟州大學路上的銀杏行道樹路段。", "note": "銀杏", "gmaps": "https://www.google.com/maps/place/102+Jejudaehak-ro/data=!4m2!3m1!1s0x350cfc5432e1687b:0x42f0fde11e1da7b"},
-{"id": 85, "name": "제주대학교 은행나무길", "name_kr": "제주대학교 은행나무길", "lat": 33.4585903, "lng": 126.5572137, "cat": "spot", "area": "濟州市·我羅洞", "desc": "濟州大學校內的銀杏大道。", "note": "銀杏", "gmaps": "https://www.google.com/maps/place/%EC%A0%9C%EC%A3%BC%EB%8C%80%ED%95%99%EA%B5%90+%EC%9D%80%ED%96%89%EB%82%98%EB%AC%B4%EA%B8%B8/data=!4m2!3m1!1s0x350cfd5dfc7992b9:0xa744dce455d2ee54"},
-{"id": 86, "name": "御里牧溪谷", "name_kr": "어리목계곡", "lat": 33.3891192, "lng": 126.4942262, "cat": "spot", "area": "漢拏山·御里牧", "desc": "漢拏山御里牧入口的溪谷，秋天賞楓。", "note": "🍁", "gmaps": "https://www.google.com/maps/place/%E5%BE%A1%E9%87%8C%E7%89%A7%E6%BA%AA%E8%B0%B7/data=!4m2!3m1!1s0x350cf8ee90ade509:0xd83c592c4cad812e"},
-{"id": 87, "name": "山麓北路 429 賞楓", "name_kr": "산록북로 429", "lat": 33.4246038, "lng": 126.5270026, "cat": "spot", "area": "濟州市·山麓北路", "desc": "山麓北路一帶的賞楓路段。", "note": "楓葉🍁", "gmaps": "https://www.google.com/maps/place/429+Sallokbuk-ro/data=!4m2!3m1!1s0x350cfea864349281:0x677c5c880e685811"},
-{"id": 88, "name": "大韓佛敎曹溪宗 天王寺", "name_kr": "대한불교조계종 천왕사", "lat": 33.4087029, "lng": 126.4944197, "cat": "spot", "area": "漢拏山·1100路", "desc": "漢拏山山腰的寺廟，秋天楓紅。", "note": "", "gmaps": "https://www.google.com/maps/place/%E5%A4%A7%E9%9F%93%E4%BD%9B%E6%95%8E%E6%9B%B9%E6%BA%AA%E5%AE%97+%E5%A4%A9%E7%8E%8B%E5%AF%BA/data=!4m2!3m1!1s0x350cf922278eb235:0xc701fd212b850243"},
-{"id": 89, "name": "天娥溪谷", "name_kr": "천아계곡", "lat": 33.3971528, "lng": 126.459872, "cat": "spot", "area": "涯月·光令里", "desc": "濟州最有名的賞楓溪谷。", "note": "", "gmaps": "https://www.google.com/maps/place/%E5%A4%A9%E5%A8%A5%E6%BA%AA%E8%B0%B7/data=!4m2!3m1!1s0x350cf9be320a1211:0x70fdb9131ea4a762"},
-{"id": 90, "name": "제주사슴책방", "name_kr": "제주사슴책방", "lat": 33.4958502, "lng": 126.6588722, "cat": "shop", "area": "朝天·大屹里", "desc": "森林裡的獨立書店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EC%A0%9C%EC%A3%BC%EC%82%AC%EC%8A%B4%EC%B1%85%EB%B0%A9/data=!4m2!3m1!1s0x350d1d7b1517fff1:0x460f835014545bcc"},
-{"id": 91, "name": "took", "name_kr": "took", "lat": 33.5109247, "lng": 126.5213179, "cat": "shop", "area": "濟州市·中央路", "desc": "巷內的禮品小店。", "note": "", "gmaps": "https://www.google.com/maps/place/took/data=!4m2!3m1!1s0x350ce50cedd1a483:0xab629b361bc04c6e"},
-{"id": 92, "name": "웨이브먼트 소품샵", "name_kr": "웨이브먼트", "lat": 33.5029732, "lng": 126.4639915, "cat": "shop", "area": "濟州市·西海岸路", "desc": "海邊的小物雜貨店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EC%9B%A8%EC%9D%B4%EB%B8%8C%EB%A8%BC%ED%8A%B8+%EC%86%8C%ED%92%88%EC%83%B5/data=!4m2!3m1!1s0x350cfb004660cbaf:0x760033381355f996"},
-{"id": 93, "name": "슬로모 slo-mo", "name_kr": "슬로모", "lat": 33.5134763, "lng": 126.52814, "cat": "shop", "area": "濟州市·山地路", "desc": "市區的選物店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EC%8A%AC%EB%A1%9C%EB%AA%A8+slo-mo/data=!4m2!3m1!1s0x350ce3001122f573:0x9e1804ccb5b05fed"},
-{"id": 94, "name": "Gyulmedal", "name_kr": "귤메달", "lat": 33.5171238, "lng": 126.5229357, "cat": "cafe", "area": "濟州市·塔洞", "desc": "橘子主題的甜點咖啡店。", "note": "", "gmaps": "https://www.google.com/maps/place/Gyulmedal/data=!4m2!3m1!1s0x350ce5a1374f337d:0x5225c899a5f4fedd"},
-{"id": 95, "name": "gyulgyulstore", "name_kr": "귤귤스토어 도두점", "lat": 33.5087904, "lng": 126.471508, "cat": "shop", "area": "濟州市·道頭", "desc": "橘子主題的紀念品店。", "note": "", "gmaps": "https://www.google.com/maps/place/gyulgyulstore/data=!4m2!3m1!1s0x350cfb3621d32435:0xaf36e459a833212"},
-{"id": 96, "name": "무드제주 MOOD JEJU", "name_kr": "무드제주", "lat": 33.5077651, "lng": 126.5152691, "cat": "shop", "area": "濟州市·南城路", "desc": "香氛與生活選物店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EB%AC%B4%EB%93%9C%EC%A0%9C%EC%A3%BC+(MOOD+JEJU)/data=!4m2!3m1!1s0x350cfbcfe39cd663:0x438acc703aeba771"},
-{"id": 97, "name": "杏源海灘 (柯南海灘)", "name_kr": "행원해변(코난해변)", "lat": 33.5575318, "lng": 126.8112241, "cat": "spot", "area": "舊左·杏源", "desc": "因柯南場景走紅的行院海邊。", "note": "", "gmaps": "https://www.google.com/maps/place/%E6%9D%8F%E6%BA%90%E6%B5%B7%E7%81%98+(%E6%9F%AF%E5%8D%97%E6%B5%B7%E7%81%98)/data=!4m2!3m1!1s0x350d179c3747e191:0x7a3b288b0d2e0911"},
-{"id": 98, "name": "萬丈窟", "name_kr": "만장굴", "lat": 33.5281972, "lng": 126.7717618, "cat": "spot", "area": "舊左·萬丈窟", "desc": "世界最長的熔岩洞窟之一，UNESCO 世界自然遺產。", "note": "", "gmaps": "https://www.google.com/maps/place/%E8%90%AC%E4%B8%88%E7%AA%9F/data=!4m2!3m1!1s0x350d19c496216a99:0xbb66abf00c2b95a6"},
-{"id": 99, "name": "소심한책방", "name_kr": "소심한책방", "lat": 33.4905308, "lng": 126.9028043, "cat": "shop", "area": "舊左·終達里", "desc": "終達里的人氣獨立書店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EC%86%8C%EC%8B%AC%ED%95%9C%EC%B1%85%EB%B0%A9/data=!4m2!3m1!1s0x350d1453d29e1905:0x70ffbddfdf31e4d1"},
-{"id": 100, "name": "달리센트", "name_kr": "달리센트", "lat": 33.4903833, "lng": 126.8986919, "cat": "shop", "area": "舊左·終達里", "desc": "香氛生活小店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EB%8B%AC%EB%A6%AC%EC%84%BC%ED%8A%B8/data=!4m2!3m1!1s0x350d15e3548dc69b:0x178606cce6d5296"},
-{"id": 101, "name": "근자c가게", "name_kr": "근자c가게", "lat": 33.4959526, "lng": 126.9013236, "cat": "shop", "area": "舊左·終達里", "desc": "終達里的雜貨小店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EA%B7%BC%EC%9E%90c%EA%B0%80%EA%B2%8C/data=!4m2!3m1!1s0x350d1452b1503ef5:0xdeb8f74501bfee7a"}
+{"id": 1, "name": "Beryl", "name_kr": "베릴", "cat": "cafe", "area": "翰林·挾才", "desc": "挾才海邊的海景咖啡廳，店家標示為 no kids zone。", "note": "海景咖啡廳", "gmaps": "https://www.google.com/maps/place/Beryl/data=!4m2!3m1!1s0x350c61af7db1848b:0x9d67c543f09a5b29", "lat": 33.3975848, "lng": 126.2425697},
+{"id": 2, "name": "늘보의 작업실", "name_kr": "늘보의 작업실", "cat": "food", "area": "舊左·終達里", "desc": "終達里的義式早午餐小館，也供應紅酒。", "note": "", "gmaps": "https://www.google.com/maps/place/%EB%8A%98%EB%B3%B4%EC%9D%98+%EC%9E%91%EC%97%85%EC%8B%A4/data=!4m2!3m1!1s0x350d15d7fe23ebb9:0xeb137f484558cf5c", "lat": 33.4959396, "lng": 126.8998255},
+{"id": 3, "name": "가는곶 세화", "name_kr": "가는곶 세화", "cat": "cafe", "area": "舊左·細花", "desc": "細花海邊的石屋咖啡廳，氣氛安靜。", "note": "", "gmaps": "https://www.google.com/maps/place/%EA%B0%80%EB%8A%94%EA%B3%B6+%EC%84%B8%ED%99%94/data=!4m2!3m1!1s0x350d179ff0a7a4b5:0xd6a66cb5fade59e3", "lat": 33.5205393, "lng": 126.8606225},
+{"id": 4, "name": "여정", "name_kr": "여정", "cat": "food", "area": "濟州市·二徒洞", "desc": "平價私廚風韓式料理，需事先預訂。", "note": "平價私廚類 要先預訂", "gmaps": "https://www.google.com/maps/place/%EC%97%AC%EC%A0%95/data=!4m2!3m1!1s0x350cfd006a919bdf:0x96b19d38ad6241be", "lat": 33.4945631, "lng": 126.5452162},
+{"id": 5, "name": "丈母食卓", "name_kr": "장모식탁", "cat": "food", "area": "濟州市·蓮信路", "desc": "家常韓食小店，推薦直接點套餐。", "note": "推套餐", "gmaps": "https://www.google.com/maps/place/%E4%B8%88%E6%AF%8D%E9%A3%9F%E5%8D%93/data=!4m2!3m1!1s0x350cfcc98099c5db:0x599f9624485fd2a0", "lat": 33.4971067, "lng": 126.546788},
+{"id": 6, "name": "Café Delmoondo", "name_kr": "델문도", "cat": "cafe", "area": "朝天·咸德", "desc": "咸德海邊的人氣咖啡烘焙館，坐位面海。", "note": "", "gmaps": "https://www.google.com/maps/place/Caf%C3%A9+Delmoondo/data=!4m2!3m1!1s0x350d1e9961b5bd7f:0xe16f5406dbb863a4", "lat": 33.5437787, "lng": 126.6688353},
+{"id": 7, "name": "생원전복", "name_kr": "생원전복", "cat": "food", "area": "安德·和順", "desc": "鮑魚專門店，招牌是鮑魚石鍋拌飯。", "note": "鮑魚石鍋拌飯", "gmaps": "https://www.google.com/maps/place/%EC%83%9D%EC%9B%90%EC%A0%84%EB%B3%B5/data=!4m2!3m1!1s0x350c43404c90de1f:0xbf9413ca7cfd9fe4", "lat": 33.2458179, "lng": 126.3307228},
+{"id": 8, "name": "Nogorok", "name_kr": "노고록", "cat": "food", "area": "西歸浦·天帝淵", "desc": "韓食小館，口碑很好，建議一開店就到。", "note": "聽說是最好吃 要一開店就去", "gmaps": "https://www.google.com/maps/place/Nogorok/data=!4m2!3m1!1s0x350c5b001d98b959:0x146dbb4434b50966", "lat": 33.2524181, "lng": 126.4266798},
+{"id": 9, "name": "DOTOREE Kitchen", "name_kr": "도토리키친 본점", "cat": "food", "area": "濟州市·北城路", "desc": "人氣早午餐與麵食店，建議先用 CatchTable 訂位。", "note": "建議先用CatchTable預約", "gmaps": "https://www.google.com/maps/place/DOTOREE+Kitchen/data=!4m2!3m1!1s0x350d1b69963f852f:0xf01e7f2c95267210", "lat": 33.5153877, "lng": 126.5186172},
+{"id": 10, "name": "豚魚吉", "name_kr": "돈어길", "cat": "food", "area": "大靜·中山間", "desc": "黑豬肉燒烤與冷麵專門店。", "note": "", "gmaps": "https://www.google.com/maps/place/%E8%B1%9A%E9%AD%9A%E5%90%89/data=!4m2!3m1!1s0x350c5db490ee2cdb:0x88a2f71838b4064", "lat": 33.28076, "lng": 126.2854572},
+{"id": 11, "name": "靑草水水拌生魚片 濟州店", "name_kr": "청초수물회 제주점", "cat": "food", "area": "涯月", "desc": "水拌生魚片名店，鮑魚粥也受歡迎。", "note": "鮑魚粥", "gmaps": "https://www.google.com/maps/place/%E9%9D%91%E8%8D%89%E6%B0%B4%E6%B0%B4%E6%8B%8C%E7%94%9F%E9%AD%9A%E7%89%87+%E6%BF%9F%E5%B7%9E%E5%BA%97/data=!4m2!3m1!1s0x350cf5207b32f2af:0x1a62d4e02cafe156", "lat": 33.4566582, "lng": 126.3091233},
+{"id": 12, "name": "Jeomjeom", "name_kr": "점점", "cat": "cafe", "area": "朝天·新村里", "desc": "新村里海邊的安靜咖啡廳。", "note": "", "gmaps": "https://www.google.com/maps/place/Jeomjeom/data=!4m2!3m1!1s0x350d1d8148987c97:0xde6c20a901d7d411", "lat": 33.537233, "lng": 126.6153298},
+{"id": 13, "name": "Shinjeju Bomal Kalguksu", "name_kr": "신제주보말칼국수 제주본점", "cat": "food", "area": "濟州市·新濟州", "desc": "海螺刀削麵本店。", "note": "海螺刀削麵", "gmaps": "https://www.google.com/maps/place/Shinjeju+Bomal+Kalguksu/data=!4m2!3m1!1s0x350cfb0d429c8993:0xcfeb2825f3149841", "lat": 33.4879343, "lng": 126.500021},
+{"id": 14, "name": "島豚 挾才黑豬肉", "name_kr": "도돈 협재흑돼지", "cat": "food", "area": "翰林·挾才", "desc": "挾才的黑豬肉炭火燒烤。", "note": "", "gmaps": "https://www.google.com/maps/place/%E5%B3%B6%E8%B1%9A+%E6%8C%BE%E6%89%8D%E9%BB%91%E8%B1%AC%E8%82%89/data=!4m2!3m1!1s0x350c610029f6fc0b:0x6c3be7f135145ec6", "lat": 33.3947961, "lng": 126.2415901},
+{"id": 15, "name": "Haehwatang", "name_kr": "해화탕", "cat": "cafe", "area": "翰林·一周西路", "desc": "翰林一帶的咖啡廳。", "note": "", "gmaps": "https://www.google.com/maps/place/Haehwatang/data=!4m2!3m1!1s0x350cf500514505a1:0xd9457e0af0a94965", "lat": 33.4433921, "lng": 126.2915933},
+{"id": 16, "name": "오드리 김밥", "name_kr": "오드리 김밥", "cat": "food", "area": "城山", "desc": "城山日出峰附近的紫菜飯捲店，適合外帶。", "note": "", "gmaps": "https://www.google.com/maps/place/%EC%98%A4%EB%93%9C%EB%A6%AC+%EA%B9%80%EB%B0%A5/data=!4m2!3m1!1s0x350d15a1c3203a7b:0xc76a6e6d63217053", "lat": 33.4631382, "lng": 126.9334513},
+{"id": 17, "name": "Gogugsu", "name_kr": "고국수", "cat": "food", "area": "濟州市·龍門路", "desc": "麵食店，早上 10 點前才供應帶魚湯麵。", "note": "早上10點前供應帶魚湯麵", "gmaps": "https://www.google.com/maps/place/Gogugsu/data=!4m2!3m1!1s0x350cfb4f0971075f:0xd10cb09e663a435e", "lat": 33.5064195, "lng": 126.509232},
+{"id": 18, "name": "무상찻집", "name_kr": "무상찻집", "cat": "cafe", "area": "濟州市·西光路", "desc": "安靜的傳統茶館。", "note": "", "gmaps": "https://www.google.com/maps/place/%EB%AC%B4%EC%83%81%EC%B0%BB%EC%A7%91/data=!4m2!3m1!1s0x350cfb29abc600ab:0xcbe286207cde115", "lat": 33.5009806, "lng": 126.5144369},
+{"id": 19, "name": "季節食卓 咸德店", "name_kr": "계절식탁 함덕점", "cat": "food", "area": "朝天·咸德", "desc": "咸德海邊二樓的韓式定食。", "note": "", "gmaps": "https://www.google.com/maps/place/%E5%AD%A3%E7%AF%80%E9%A3%9F%E5%8D%93+%E5%92%B8%E5%BE%B7%E5%BA%97/data=!4m2!3m1!1s0x350d1f1f715a326d:0x2891ca25b75d29df", "lat": 33.5425961, "lng": 126.6674297},
+{"id": 20, "name": "Ppolsaljip", "name_kr": "뽈살집", "cat": "food", "area": "西歸浦·中央洞", "desc": "豬頰肉燒烤店。", "note": "", "gmaps": "https://www.google.com/maps/place/Ppolsaljip/data=!4m2!3m1!1s0x350c539c55c10f71:0x3295985b068bb521", "lat": 33.2508339, "lng": 126.5628867},
+{"id": 21, "name": "Iltong Iban", "name_kr": "일통이반", "cat": "food", "area": "濟州市·中央路", "desc": "市區的海鮮料理店。", "note": "", "gmaps": "https://www.google.com/maps/place/Iltong+Iban/data=!4m2!3m1!1s0x350ce4a9d5e14011:0x2025d5df2e52287f", "lat": 33.5170648, "lng": 126.5221484},
+{"id": 22, "name": "熟成到 涯月店", "name_kr": "숙성도 애월점", "cat": "food", "area": "涯月", "desc": "熟成黑豬肉名店的涯月分店。", "note": "", "gmaps": "https://www.google.com/maps/place/%E7%86%9F%E6%88%90%E5%88%B0+%E6%B6%AF%E6%9C%88%E5%BA%97/data=!4m2!3m1!1s0x350cf5376a720e8b:0xb3812aa6ac650454", "lat": 33.463515, "lng": 126.3096504},
+{"id": 23, "name": "Floyeast Bakery Cafe", "name_kr": "플로이스트 베이커리 카페", "cat": "cafe", "area": "城山·古城里", "desc": "城山的烘焙咖啡館。", "note": "", "gmaps": "https://www.google.com/maps/place/Floyeast+Bakery+Cafe/data=!4m2!3m1!1s0x350d130006ad457f:0x6e905e0a24cbac63", "lat": 33.4291562, "lng": 126.9338099},
+{"id": 24, "name": "Cafe Out Of Ordinary", "name_kr": "카페 아오오", "cat": "cafe", "area": "城山·環海長城路", "desc": "面海的景觀咖啡廳。", "note": "", "gmaps": "https://www.google.com/maps/place/Cafe+Out+Of+Ordinary/data=!4m2!3m1!1s0x350d13973971b137:0xb443b7e31a57491b", "lat": 33.3791372, "lng": 126.8799189},
+{"id": 25, "name": "고결 고등어숯불반상", "name_kr": "고결 고등어숯불반상", "cat": "food", "area": "大靜·兄弟海岸", "desc": "炭烤鯖魚定食，二樓看得到兄弟島。", "note": "", "gmaps": "https://www.google.com/maps/place/%EA%B3%A0%EA%B2%B0+%EA%B3%A0%EB%93%B1%EC%96%B4%EC%88%AF%EB%B6%88%EB%B0%98%EC%83%81/data=!4m2!3m1!1s0x350c439205c7a713:0x98a415c26a3cb0ac", "lat": 33.2068097, "lng": 126.2899923},
+{"id": 26, "name": "老奶奶的年糕", "name_kr": "할머니떡집", "cat": "cafe", "area": "西歸浦·西歸洞", "desc": "老字號年糕店。", "note": "", "gmaps": "https://www.google.com/maps/place/%E8%80%81%E5%A5%B6%E5%A5%B6%E7%9A%84%E5%B9%B4%E7%B3%95/data=!4m2!3m1!1s0x350c539dc531ebef:0xb9d609457f494057", "lat": 33.2486024, "lng": 126.5642223},
+{"id": 27, "name": "麵條海洋 本店", "name_kr": "국수바다 본점", "cat": "food", "area": "西歸浦·一周西路", "desc": "豬肉湯麵老店。", "note": "", "gmaps": "https://www.google.com/maps/place/%E9%BA%B5%E6%A2%9D%E6%B5%B7%E6%B4%8B+%E6%9C%AC%E5%BA%97/data=!4m2!3m1!1s0x350c5a97de6bc439:0xd72da3c9bd9b38fa", "lat": 33.253023, "lng": 126.447197},
+{"id": 28, "name": "Miyoung's Sashimi", "name_kr": "미영이네", "cat": "food", "area": "大靜·摹瑟浦", "desc": "生魚片與水拌生魚片名店。", "note": "", "gmaps": "https://www.google.com/maps/place/Miyoung's+Sashimi/data=!4m2!3m1!1s0x350c69f72c653503:0x735a1423dfdddac2", "lat": 33.2177388, "lng": 126.2498932},
+{"id": 29, "name": "兄弟島海螺刀切麵", "name_kr": "형제섬보말칼국수", "cat": "food", "area": "大靜·兄弟海岸", "desc": "面對兄弟島的海螺刀削麵店。", "note": "", "gmaps": "https://www.google.com/maps/place/%E5%85%84%E5%BC%9F%E5%B3%B6%E6%B5%B7%E8%9E%BA%E5%88%80%E5%88%87%E9%BA%B5/data=!4m2!3m1!1s0x350c423bba5f6739:0x59e837b9cca35040", "lat": 33.2069012, "lng": 126.2902768},
+{"id": 30, "name": "Tongbal", "name_kr": "통발", "cat": "food", "area": "城山·日出路", "desc": "城山的居酒屋。", "note": "", "gmaps": "https://www.google.com/maps/place/Tongbal/data=!4m2!3m1!1s0x350d152b174b98b9:0xed1678ef1c86571c", "lat": 33.4609516, "lng": 126.9341431},
+{"id": 31, "name": "도토리 제주점", "name_kr": "도토리 제주점", "cat": "cafe", "area": "涯月", "desc": "涯月的人氣麵包店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EB%8F%84%ED%86%A0%EB%A6%AC+%EC%A0%9C%EC%A3%BC%EC%A0%90/data=!4m2!3m1!1s0x350cf50047202a4f:0xeae3b0fa977a0b45", "lat": 33.4632162, "lng": 126.3097137},
+{"id": 32, "name": "Sogeumbachi Sooninae", "name_kr": "소금바치 순이네", "cat": "food", "area": "舊左·終達里", "desc": "海女風海鮮家常菜。", "note": "", "gmaps": "https://www.google.com/maps/place/Sogeumbachi+Sooninae/data=!4m2!3m1!1s0x350d150846ae2559:0xd6c53d0e7b976bfd", "lat": 33.5035471, "lng": 126.9127463},
+{"id": 33, "name": "月高家 黑豬肉", "name_kr": "월고집 월정리고기집", "cat": "food", "area": "舊左·月汀里", "desc": "月汀里的黑豬肉燒烤店。", "note": "", "gmaps": "https://www.google.com/maps/place/%E6%9C%88%E9%AB%98%E5%AE%B6+%E9%BB%91%E8%B1%AC%E8%82%89/data=!4m2!3m1!1s0x350d172adde62f3d:0x60b565d5001399c4", "lat": 33.5533544, "lng": 126.7911073},
+{"id": 34, "name": "바담깨비애월회관", "name_kr": "바담깨비애월회관", "cat": "food", "area": "涯月·海岸路", "desc": "涯月海岸路上的海鮮餐廳。", "note": "", "gmaps": "https://www.google.com/maps/place/%EB%B0%94%EB%8B%B4%EA%B9%A8%EB%B9%84%EC%95%A0%EC%9B%94%ED%9A%8C%EA%B4%80/data=!4m2!3m1!1s0x350cf1de0822f097:0x421b901eb106f12b", "lat": 33.4838162, "lng": 126.3956061},
+{"id": 35, "name": "Blanc Rocher", "name_kr": "블랑로쉐", "cat": "cafe", "area": "牛島", "desc": "牛島上的咖啡廳。", "note": "", "gmaps": "https://www.google.com/maps/place/Blanc+Rocher/data=!4m2!3m1!1s0x350d4001de8a55a5:0x4407664131cf52d7", "lat": 33.5156863, "lng": 126.9580858},
+{"id": 36, "name": "Modern Dombe", "name_kr": "모던돔베 공항본점", "cat": "food", "area": "濟州市·機場旁", "desc": "돔베고기與麵食，離機場近。", "note": "", "gmaps": "https://www.google.com/maps/place/Modern+Dombe/data=!4m2!3m1!1s0x350cfbe9b32dd343:0x15786c0e93a18cda", "lat": 33.4570687, "lng": 126.4860197},
+{"id": 37, "name": "Coffee Temple Jeju", "name_kr": "커피템플", "cat": "cafe", "area": "濟州市·永坪", "desc": "濟州知名的精品咖啡烘豆店。", "note": "", "gmaps": "https://www.google.com/maps/place/Coffee+Temple+Jeju/data=!4m2!3m1!1s0x350cfd213f739b25:0xc42ea610142d6a43", "lat": 33.4781416, "lng": 126.5702901},
+{"id": 38, "name": "Cafe Gyulkkot Darak", "name_kr": "귤꽃다락", "cat": "cafe", "area": "西歸浦·Ieodo路", "desc": "橘子園裡的咖啡廳。", "note": "", "gmaps": "https://www.google.com/maps/place/Cafe+Gyulkkot+Darak/data=!4m2!3m1!1s0x357b5b5937c887d1:0x49c86381b28349ab", "lat": 33.2464249, "lng": 126.5225977},
+{"id": 39, "name": "Your Rice Cake", "name_kr": "유라케", "cat": "cafe", "area": "濟州市·龍海路", "desc": "手作年糕甜點店。", "note": "", "gmaps": "https://www.google.com/maps/place/Your+Rice+Cake/data=!4m2!3m1!1s0x350cfb414d7ed325:0x958c808949701aeb", "lat": 33.5073504, "lng": 126.504776},
+{"id": 40, "name": "태광식당", "name_kr": "태광식당", "cat": "food", "area": "濟州市·塔洞", "desc": "塔洞路上的老式食堂。", "note": "", "gmaps": "https://www.google.com/maps/place/%ED%83%9C%EA%B4%91%EC%8B%9D%EB%8B%B9/data=!4m2!3m1!1s0x350ce4ab6b263a73:0x4971547aec5bc188", "lat": 33.5126649, "lng": 126.5186913},
+{"id": 41, "name": "London Bagel Museum Jeju", "name_kr": "런던베이글뮤지엄 제주점", "cat": "cafe", "area": "舊左·東福里", "desc": "人氣貝果店的濟州分店，常需排隊。", "note": "", "gmaps": "https://www.google.com/maps/place/London+Bagel+Museum+Jeju/data=!4m2!3m1!1s0x350d1970b7a01c3b:0x9522d57871ef1c43", "lat": 33.5535978, "lng": 126.7155939},
+{"id": 42, "name": "濟州韓麵家", "name_kr": "제주한면가", "cat": "food", "area": "朝天·北宣路", "desc": "韓式麵食，豆豆飯飯值得點。", "note": "豆豆飯飯推薦", "gmaps": "https://www.google.com/maps/place/%E6%BF%9F%E5%B7%9E%E9%9F%93%E9%BA%B5%E5%AE%B6/data=!4m2!3m1!1s0x350d1bf419149e6b:0x92e96aec5a2fb688", "lat": 33.5120324, "lng": 126.7000256},
+{"id": 43, "name": "Kkotdwaeji Grill", "name_kr": "꽃돼지 연탄 구이", "cat": "food", "area": "西歸浦·大浦洞", "desc": "煤炭火烤豬肉。", "note": "", "gmaps": "https://www.google.com/maps/place/Kkotdwaeji+Grill/data=!4m2!3m1!1s0x350c500c50bbecd1:0x583650d5775fd1c2", "lat": 33.242032, "lng": 126.4439877},
+{"id": 44, "name": "so much more", "name_kr": "so much more", "cat": "cafe", "area": "朝天·北村", "desc": "北村的咖啡廳。", "note": "", "gmaps": "https://www.google.com/maps/place/so+much+more/data=!4m2!3m1!1s0x350d1f004af53b87:0x7a76b48c79db3b31", "lat": 33.5503288, "lng": 126.6948041},
+{"id": 45, "name": "Udo Sand", "name_kr": "우도샌드", "cat": "cafe", "area": "牛島", "desc": "牛島的甜點店。", "note": "", "gmaps": "https://www.google.com/maps/place/Udo+Sand/data=!4m2!3m1!1s0x350d410b354c9e39:0x55cc314b08679240", "lat": 33.5162432, "lng": 126.9576266},
+{"id": 46, "name": "Oleun", "name_kr": "오른", "cat": "cafe", "area": "城山·迎日海岸路", "desc": "海邊的景觀咖啡廳。", "note": "", "gmaps": "https://www.google.com/maps/place/Oleun/data=!4m2!3m1!1s0x350d150051d5a409:0xc19375fa183ba71b", "lat": 33.4741667, "lng": 126.9111111},
+{"id": 47, "name": "엉클프레즐하우스", "name_kr": "엉클프레즐하우스", "cat": "cafe", "area": "朝天·咸德", "desc": "手作扭結餅專賣店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EC%97%89%ED%81%B4%ED%94%84%EB%A0%88%EC%A6%90%ED%95%98%EC%9A%B0%EC%8A%A4/data=!4m2!3m1!1s0x350d1f9d1c09edb1:0xb6d6db4faae22596", "lat": 33.5413678, "lng": 126.6742925},
+{"id": 48, "name": "駱駝咖啡 濟州店", "name_kr": "카멜커피 제주점", "cat": "cafe", "area": "舊左·杏源", "desc": "人氣카멜커피的濟州海景店。", "note": "", "gmaps": "https://www.google.com/maps/place/%E9%A7%B1%E9%A7%9D%E5%92%96%E5%95%A1+%E6%BF%9F%E5%B7%9E%E5%BA%97/data=!4m2!3m1!1s0x350d17001bae2799:0xcc709688d6b7c59b", "lat": 33.5568768, "lng": 126.8098896},
+{"id": 49, "name": "Daily Stitch", "name_kr": "dailystitch", "cat": "shop", "area": "朝天·咸德", "desc": "咸德的刺繡雜貨小店。", "note": "", "gmaps": "https://www.google.com/maps/place/Daily+Stitch/data=!4m2!3m1!1s0x350ce2e67191f38b:0x61a1dca91586c753", "lat": 33.5419995, "lng": 126.6640605},
+{"id": 50, "name": "沙溪海岸", "name_kr": "사계해안", "cat": "spot", "area": "安德·沙溪", "desc": "可遠望兄弟島與山房山的黑沙海岸。", "note": "", "gmaps": "https://www.google.com/maps/place/%E6%B2%99%E6%BA%AA%E6%B5%B7%E5%B2%B8/data=!4m2!3m1!1s0x350c43dfaeea13c3:0x2546acd773084eed", "lat": 33.2231459, "lng": 126.297477},
+{"id": 51, "name": "Ttarabi Oreum", "name_kr": "따라비오름", "cat": "spot", "area": "表善·加時里", "desc": "有「오름女王」之稱的火山丘，來回步行約一小時。", "note": "步行總路程1小時內", "gmaps": "https://www.google.com/maps/place/Ttarabi+Oreum/data=!4m2!3m1!1s0x350d05a4217b2df3:0x473a94e5433f79b5", "lat": 33.3870582, "lng": 126.7534582},
+{"id": 52, "name": "D&DEPARTMENT JEJU by ARARIO", "name_kr": "디앤디파트먼트 제주 바이 아라리오", "cat": "shop", "area": "濟州市·塔洞", "desc": "主打濟州在地設計的生活選物店。", "note": "", "gmaps": "https://www.google.com/maps/place/D%26DEPARTMENT+JEJU+by+ARARIO/data=!4m2!3m1!1s0x350ce399db600891:0x26e2db239c7f35c2", "lat": 33.5176855, "lng": 126.5234639},
+{"id": 53, "name": "挾才海水浴場", "name_kr": "협재해수욕장", "cat": "spot", "area": "翰林·挾才", "desc": "看得到飛揚島的翡翠色沙灘。", "note": "", "gmaps": "https://www.google.com/maps/place/%E6%8C%BE%E6%89%8D%E6%B5%B7%E6%B0%B4%E6%B5%B4%E5%A0%B4/data=!4m2!3m1!1s0x350c6100c373b0f1:0x6ce2ce2c47a28400", "lat": 33.3942945, "lng": 126.2398813},
+{"id": 54, "name": "1100高地 休憩所", "name_kr": "1100고지 휴게소", "cat": "spot", "area": "西歸浦·穡達洞", "desc": "1100 公路最高點的休息站與濕地，秋天賞楓。", "note": "楓葉🍁", "gmaps": "https://www.google.com/maps/place/1100%E9%AB%98%E5%9C%B0+%E4%BC%91%E6%86%A9%E6%89%80/data=!4m2!3m1!1s0x350c57c0decbb733:0xd9bf1dcb826c5b1a", "lat": 33.3577959, "lng": 126.4624949},
+{"id": 55, "name": "고내리 바닷길 포토스팟", "name_kr": "고내리 바닷길 포토스팟", "cat": "spot", "area": "涯月·高內里", "desc": "高內里海邊小路的熱門拍照點。", "note": "", "gmaps": "https://www.google.com/maps/place/%EA%B3%A0%EB%82%B4%EB%A6%AC+%EB%B0%94%EB%8B%B7%EA%B8%B8+%ED%8F%AC%ED%86%A0%EC%8A%A4%ED%8C%9F/data=!4m2!3m1!1s0x350cf50032a45cdf:0x5dca902b7ffde8ef", "lat": 33.4666262, "lng": 126.3346484},
+{"id": 56, "name": "Leude", "name_kr": "르데", "cat": "shop", "area": "安德·沙溪", "desc": "沙溪的選物與禮品店。", "note": "", "gmaps": "https://www.google.com/maps/place/Leude/data=!4m2!3m1!1s0x350c430014d195f3:0x37e88db1ffd1a678", "lat": 33.2489465, "lng": 126.3220571},
+{"id": 57, "name": "Artbox Jeju Yeondong", "name_kr": "아트박스 제주연동점", "cat": "shop", "area": "濟州市·蓮洞", "desc": "韓國連鎖文具雜貨店。", "note": "", "gmaps": "https://www.google.com/maps/place/Artbox+Jeju+Yeondong/data=!4m2!3m1!1s0x350cfb6ebcdb0409:0x5acd06b226d785fb", "lat": 33.4877006, "lng": 126.4910151},
+{"id": 58, "name": "新川牧場", "name_kr": "신천목장", "cat": "spot", "area": "城山·新豐里", "desc": "海邊的廣闊牧草地，冬天會鋪滿橘皮。", "note": "", "gmaps": "https://www.google.com/maps/place/%E6%96%B0%E5%B7%9D%E7%89%A7%E5%A0%B4/data=!4m2!3m1!1s0x350d0e8e7c78eea1:0xc6f96777dfd33086", "lat": 33.3567015, "lng": 126.8682182},
+{"id": 59, "name": "Bigpokes", "name_kr": "빅포켓", "cat": "shop", "area": "濟州市·觀德路", "desc": "市區的雜貨禮品店。", "note": "", "gmaps": "https://www.google.com/maps/place/Bigpokes/data=!4m2!3m1!1s0x350ce589ed15ff97:0xb3f8a7f607405cb8", "lat": 33.5129348, "lng": 126.5214933},
+{"id": 60, "name": "Hamdeok Beach", "name_kr": "함덕해수욕장", "cat": "spot", "area": "朝天·咸德", "desc": "濟州最有名的碧綠色海水浴場。", "note": "", "gmaps": "https://www.google.com/maps/place/Hamdeok+Beach/data=!4m2!3m1!1s0x350cfcafaaf72b55:0xf0d2596ca578b870", "lat": 33.5434231, "lng": 126.6697752},
+{"id": 61, "name": "Heisan Jeju Flagship Store", "name_kr": "헤이산 제주", "cat": "shop", "area": "涯月", "desc": "服飾品牌的涯月旗艦店。", "note": "", "gmaps": "https://www.google.com/maps/place/Heisan+Jeju+Flagship+Store/data=!4m2!3m1!1s0x350cf5440de1b0bf:0x68e1c1531b138e33", "lat": 33.463027, "lng": 126.3097897},
+{"id": 62, "name": "수풀 제주 스토어", "name_kr": "수풀 제주 스토어", "cat": "shop", "area": "翰林·翰水浦路", "desc": "設計家飾選物店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EC%88%98%ED%92%80+%EC%A0%9C%EC%A3%BC+%EC%8A%A4%ED%86%A0%EC%96%B4/data=!4m2!3m1!1s0x350c5f9dadce38e9:0xeba87f2d520f9225", "lat": 33.4179013, "lng": 126.2666193},
+{"id": 63, "name": "Lu-Inhom", "name_kr": "루인홈", "cat": "shop", "area": "朝天·中山間東路", "desc": "禮品雜貨店。", "note": "", "gmaps": "https://www.google.com/maps/place/Lu-Inhom/data=!4m2!3m1!1s0x350d1d4bb667516d:0xc71079bddf7f61c6", "lat": 33.5029546, "lng": 126.6942576},
+{"id": 64, "name": "Mulyohi", "name_kr": "무료히", "cat": "shop", "area": "濟州市·三徒二洞", "desc": "市區巷內的雜貨小舖。", "note": "", "gmaps": "https://www.google.com/maps/place/Mulyohi/data=!4m2!3m1!1s0x350ce3003be93445:0xd7f0ce24ff7373cb", "lat": 33.5100889, "lng": 126.5235413},
+{"id": 65, "name": "hetras Jeju", "name_kr": "헤트라스 제주", "cat": "shop", "area": "濟州市·新光路", "desc": "美妝保養品店。", "note": "", "gmaps": "https://www.google.com/maps/place/hetras+Jeju/data=!4m2!3m1!1s0x350cfb3099c6ddc1:0xa1f4452f935524b0", "lat": 33.4901546, "lng": 126.4899427},
+{"id": 66, "name": "8 Gwandeok-ro 選物店", "name_kr": "관덕로 8", "cat": "shop", "area": "濟州市·觀德路", "desc": "觀德路 8 號的選物店。", "note": "選物店", "gmaps": "https://www.google.com/maps/place/8+Gwandeok-ro/data=!4m2!3m1!1s0x350ce4aafd8173ad:0x3203785115d0afcb", "lat": 33.5127489, "lng": 126.5202265},
+{"id": 67, "name": "MyLittleJinji", "name_kr": "마이리틀진지", "cat": "shop", "area": "濟州市·道頭洞", "desc": "飾品與時尚小店。", "note": "", "gmaps": "https://www.google.com/maps/place/MyLittleJinji+%EB%A7%88%EC%9D%B4%EB%A6%AC%ED%8B%80%EC%A7%84%EC%A7%80/data=!4m2!3m1!1s0x350cfb214507905f:0x8ebfce50ae5d1317", "lat": 33.5029707, "lng": 126.463959},
+{"id": 68, "name": "엠와이제주", "name_kr": "엠와이제주", "cat": "shop", "area": "濟州市·三無路", "desc": "禮品雜貨店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EC%97%A0%EC%99%80%EC%9D%B4%EC%A0%9C%EC%A3%BC/data=!4m2!3m1!1s0x350cfb003cd30045:0xa0537b2852d3c049", "lat": 33.4901323, "lng": 126.4905208},
+{"id": 69, "name": "Assisi 濟州香水", "name_kr": "애월 아시시", "cat": "shop", "area": "涯月·海岸路", "desc": "香氛品牌店，可做濟州主題香水。", "note": "濟州香水", "gmaps": "https://www.google.com/maps/place/Assisi/data=!4m2!3m1!1s0x350cf7c18e7666c3:0x715e67b4e43f267f", "lat": 33.4778079, "lng": 126.3550408},
+{"id": 70, "name": "탱글 (소품샵)", "name_kr": "탱글", "cat": "shop", "area": "涯月", "desc": "小物雜貨店。", "note": "", "gmaps": "https://www.google.com/maps/place/%ED%83%B1%EA%B8%80(%EC%86%8C%ED%92%88%EC%83%B5)/data=!4m2!3m1!1s0x350cf50043825c7b:0xb170e3182091e792", "lat": 33.4656631, "lng": 126.3200485},
+{"id": 71, "name": "던스트 제주 플래그십 스토어", "name_kr": "던스트 제주 플래그십 스토어", "cat": "shop", "area": "涯月", "desc": "韓國服飾品牌 DUNST 的濟州旗艦店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EB%8D%98%EC%8A%A4%ED%8A%B8+%EC%A0%9C%EC%A3%BC+%ED%94%8C%EB%9E%98%EA%B7%B8%EC%8B%AD+%EC%8A%A4%ED%86%A0%EC%96%B4/data=!4m2!3m1!1s0x350cf50d2c2c2529:0x7a8beb91646ca44a", "lat": 33.4625151, "lng": 126.3094702},
+{"id": 72, "name": "메르시제주 MERCI JEJU", "name_kr": "메르시제주", "cat": "shop", "area": "濟州市·龍頭岩路", "desc": "濟州伴手禮專賣店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EB%A9%94%EB%A5%B4%EC%8B%9C%EC%A0%9C%EC%A3%BC+%7C+%E6%BF%9F%E5%B7%9E%E5%B3%B6%E7%B4%80%E5%BF%B5%E5%93%81+%7C+%E6%BF%9F%E5%B7%9E%E5%B3%B6%E4%BC%B4%E6%89%8B%E7%A6%AE+%7C+MERCI+JEJU+SOUVENIR+SHOP+%7C/data=!4m2!3m1!1s0x350ce522dc44004d:0x2438ef51fd9e076d", "lat": 33.5145824, "lng": 126.5129743},
+{"id": 73, "name": "甫木浦口階段", "name_kr": "보목포구계단", "cat": "spot", "area": "西歸浦·甫木", "desc": "海中階梯，退潮前後一小時才會露出。", "note": "要降朝前後一小時", "gmaps": "https://www.google.com/maps/place/%E7%94%AB%E6%9C%A8%E6%B5%A6%E5%8F%A3%E9%9A%8E%E6%AE%B5/data=!4m2!3m1!1s0x350c53005e934907:0xd24ce28e73edcfd0", "lat": 33.2395268, "lng": 126.6073589},
+{"id": 74, "name": "세기알해변", "name_kr": "세기알해변", "cat": "spot", "area": "舊左·金寧", "desc": "金寧一帶的小海灣，浮潛與潛水點。", "note": "", "gmaps": "https://www.google.com/maps/place/%EC%84%B8%EA%B8%B0%EC%95%8C%ED%95%B4%EB%B3%80/data=!4m2!3m1!1s0x350d19184f7d0061:0xfe15ecc10c2c6277", "lat": 33.558169, "lng": 126.7553943},
+{"id": 75, "name": "모아이 MOI", "name_kr": "모아이 MOI", "cat": "shop", "area": "濟州市·東門路", "desc": "禮品選物店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EB%AA%A8%EC%95%84%EC%9D%B4+MOI/data=!4m2!3m1!1s0x350ce337975caadf:0x8f28911a5c85cb09", "lat": 33.5129041, "lng": 126.5344251},
+{"id": 76, "name": "城山日出峰", "name_kr": "성산일출봉", "cat": "spot", "area": "城山", "desc": "UNESCO 世界自然遺產的火山口，看日出的名所。", "note": "", "gmaps": "https://www.google.com/maps/place/%E5%9F%8E%E5%B1%B1%E6%97%A5%E5%87%BA%E5%B3%B0/data=!4m2!3m1!1s0x350d14b9f6e3789f:0x555132053a23b64b", "lat": 33.458056, "lng": 126.9425},
+{"id": 77, "name": "龍頭海岸", "name_kr": "용머리해안", "cat": "spot", "area": "安德·沙溪", "desc": "山房山下的層積岩海岸，會依潮位與天氣封閉。", "note": "", "gmaps": "https://www.google.com/maps/place/%E9%BE%8D%E9%A0%AD%E6%B5%B7%E5%B2%B8/data=!4m2!3m1!1s0x350c4307a770e15b:0x5f8461d229ddab28", "lat": 33.2316155, "lng": 126.3148321},
+{"id": 78, "name": "O'sulloc Tea Museum", "name_kr": "오설록 티 뮤지엄", "cat": "spot", "area": "安德·神話歷史路", "desc": "綠茶園裡的 O'sulloc 茶博物館。", "note": "", "gmaps": "https://www.google.com/maps/place/%E3%82%AA%E3%82%BD%E3%83%AB%E3%83%AD%E3%83%83%E3%82%AF%E3%83%BB%E3%83%86%E3%82%A3%E3%83%BC%E3%83%BB%E3%83%9F%E3%83%A5%E3%83%BC%E3%82%B8%E3%82%A2%E3%83%A0/data=!4m2!3m1!1s0x350c5d1219ebcc11:0xb8a71289da43cad1", "lat": 33.3059385, "lng": 126.2894355},
+{"id": 79, "name": "김녕해수욕장", "name_kr": "김녕해수욕장", "cat": "spot", "area": "舊左·金寧", "desc": "水色清透的金寧海水浴場。", "note": "", "gmaps": "https://www.google.com/maps/place/%EA%B9%80%EB%85%95%ED%95%B4%EC%88%98%EC%9A%95%EC%9E%A5/data=!4m2!3m1!1s0x350d184767ce97e3:0x63f0205bf57e068f", "lat": 33.5582774, "lng": 126.759787},
+{"id": 80, "name": "aeae 제주점", "name_kr": "aeae 제주점", "cat": "shop", "area": "濟州市·觀德路", "desc": "女裝選物店。", "note": "", "gmaps": "https://www.google.com/maps/place/aeae+%EC%A0%9C%EC%A3%BC%EC%A0%90/data=!4m2!3m1!1s0x350ce3859622bef1:0xb56c08d61da85054", "lat": 33.5146606, "lng": 126.5264318},
+{"id": 81, "name": "섬조각 somejogak", "name_kr": "섬조각", "cat": "shop", "area": "濟州市·中央路", "desc": "濟州風紀念品小店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EC%84%AC%EC%A1%B0%EA%B0%81+somejogak/data=!4m2!3m1!1s0x350ce339102c9b77:0xb3b53dae96e23a4a", "lat": 33.5148942, "lng": 126.5273838},
+{"id": 82, "name": "오브젝트 제주점 Object Jeju", "name_kr": "오브젝트 제주점", "cat": "shop", "area": "舊左·東福里", "desc": "韓國文創雜貨 Object 的濟州店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EC%98%A4%EB%B8%8C%EC%A0%9D%ED%8A%B8+%EC%A0%9C%EC%A3%BC%EC%A0%90+Object+Jeju+Branch/data=!4m2!3m1!1s0x350d19001294129d:0xb018f43394d06bd5", "lat": 33.5533877, "lng": 126.7156758},
+{"id": 83, "name": "金寧海邊 海岸路", "name_kr": "김녕해변 바닷길", "cat": "spot", "area": "舊左·金寧", "desc": "金寧海邊的海岸散步路。", "note": "", "gmaps": "https://www.google.com/maps/place/%E9%87%91%E5%AF%A7%E6%B5%B7%E9%82%8A+%E6%B5%B7%E5%B2%B8%E8%B7%AF/data=!4m2!3m1!1s0x350d19216549061f:0x38836d0a5826c23", "lat": 33.5578652, "lng": 126.7488633},
+{"id": 84, "name": "濟州大學路 102 銀杏", "name_kr": "제주대학로 102", "cat": "spot", "area": "濟州市·我羅洞", "desc": "濟州大學路上的銀杏行道樹路段。", "note": "銀杏", "gmaps": "https://www.google.com/maps/place/102+Jejudaehak-ro/data=!4m2!3m1!1s0x350cfc5432e1687b:0x42f0fde11e1da7b", "lat": 33.4547583, "lng": 126.5622562},
+{"id": 85, "name": "제주대학교 은행나무길", "name_kr": "제주대학교 은행나무길", "cat": "spot", "area": "濟州市·我羅洞", "desc": "濟州大學校內的銀杏大道。", "note": "銀杏", "gmaps": "https://www.google.com/maps/place/%EC%A0%9C%EC%A3%BC%EB%8C%80%ED%95%99%EA%B5%90+%EC%9D%80%ED%96%89%EB%82%98%EB%AC%B4%EA%B8%B8/data=!4m2!3m1!1s0x350cfd5dfc7992b9:0xa744dce455d2ee54", "lat": 33.4585903, "lng": 126.5572137},
+{"id": 86, "name": "御里牧溪谷", "name_kr": "어리목계곡", "cat": "spot", "area": "漢拏山·御里牧", "desc": "漢拏山御里牧入口的溪谷，秋天賞楓。", "note": "🍁", "gmaps": "https://www.google.com/maps/place/%E5%BE%A1%E9%87%8C%E7%89%A7%E6%BA%AA%E8%B0%B7/data=!4m2!3m1!1s0x350cf8ee90ade509:0xd83c592c4cad812e", "lat": 33.3891192, "lng": 126.4942262},
+{"id": 87, "name": "山麓北路 429 賞楓", "name_kr": "산록북로 429", "cat": "spot", "area": "濟州市·山麓北路", "desc": "山麓北路一帶的賞楓路段。", "note": "楓葉🍁", "gmaps": "https://www.google.com/maps/place/429+Sallokbuk-ro/data=!4m2!3m1!1s0x350cfea864349281:0x677c5c880e685811", "lat": 33.4246038, "lng": 126.5270026},
+{"id": 88, "name": "大韓佛敎曹溪宗 天王寺", "name_kr": "대한불교조계종 천왕사", "cat": "spot", "area": "漢拏山·1100路", "desc": "漢拏山山腰的寺廟，秋天楓紅。", "note": "", "gmaps": "https://www.google.com/maps/place/%E5%A4%A7%E9%9F%93%E4%BD%9B%E6%95%8E%E6%9B%B9%E6%BA%AA%E5%AE%97+%E5%A4%A9%E7%8E%8B%E5%AF%BA/data=!4m2!3m1!1s0x350cf922278eb235:0xc701fd212b850243", "lat": 33.4087029, "lng": 126.4944197},
+{"id": 89, "name": "天娥溪谷", "name_kr": "천아계곡", "cat": "spot", "area": "涯月·光令里", "desc": "濟州最有名的賞楓溪谷。", "note": "", "gmaps": "https://www.google.com/maps/place/%E5%A4%A9%E5%A8%A5%E6%BA%AA%E8%B0%B7/data=!4m2!3m1!1s0x350cf9be320a1211:0x70fdb9131ea4a762", "lat": 33.3971528, "lng": 126.459872},
+{"id": 90, "name": "제주사슴책방", "name_kr": "제주사슴책방", "cat": "shop", "area": "朝天·大屹里", "desc": "森林裡的獨立書店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EC%A0%9C%EC%A3%BC%EC%82%AC%EC%8A%B4%EC%B1%85%EB%B0%A9/data=!4m2!3m1!1s0x350d1d7b1517fff1:0x460f835014545bcc", "lat": 33.4958502, "lng": 126.6588722},
+{"id": 91, "name": "took", "name_kr": "took", "cat": "shop", "area": "濟州市·中央路", "desc": "巷內的禮品小店。", "note": "", "gmaps": "https://www.google.com/maps/place/took/data=!4m2!3m1!1s0x350ce50cedd1a483:0xab629b361bc04c6e", "lat": 33.5109247, "lng": 126.5213179},
+{"id": 92, "name": "웨이브먼트 소품샵", "name_kr": "웨이브먼트", "cat": "shop", "area": "濟州市·西海岸路", "desc": "海邊的小物雜貨店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EC%9B%A8%EC%9D%B4%EB%B8%8C%EB%A8%BC%ED%8A%B8+%EC%86%8C%ED%92%88%EC%83%B5/data=!4m2!3m1!1s0x350cfb004660cbaf:0x760033381355f996", "lat": 33.5029732, "lng": 126.4639915},
+{"id": 93, "name": "슬로모 slo-mo", "name_kr": "슬로모", "cat": "shop", "area": "濟州市·山地路", "desc": "市區的選物店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EC%8A%AC%EB%A1%9C%EB%AA%A8+slo-mo/data=!4m2!3m1!1s0x350ce3001122f573:0x9e1804ccb5b05fed", "lat": 33.5134763, "lng": 126.52814},
+{"id": 94, "name": "Gyulmedal", "name_kr": "귤메달", "cat": "cafe", "area": "濟州市·塔洞", "desc": "橘子主題的甜點咖啡店。", "note": "", "gmaps": "https://www.google.com/maps/place/Gyulmedal/data=!4m2!3m1!1s0x350ce5a1374f337d:0x5225c899a5f4fedd", "lat": 33.5171238, "lng": 126.5229357},
+{"id": 95, "name": "gyulgyulstore", "name_kr": "귤귤스토어 도두점", "cat": "shop", "area": "濟州市·道頭", "desc": "橘子主題的紀念品店。", "note": "", "gmaps": "https://www.google.com/maps/place/gyulgyulstore/data=!4m2!3m1!1s0x350cfb3621d32435:0xaf36e459a833212", "lat": 33.5087904, "lng": 126.471508},
+{"id": 96, "name": "무드제주 MOOD JEJU", "name_kr": "무드제주", "cat": "shop", "area": "濟州市·南城路", "desc": "香氛與生活選物店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EB%AC%B4%EB%93%9C%EC%A0%9C%EC%A3%BC+(MOOD+JEJU)/data=!4m2!3m1!1s0x350cfbcfe39cd663:0x438acc703aeba771", "lat": 33.5077651, "lng": 126.5152691},
+{"id": 97, "name": "杏源海灘 (柯南海灘)", "name_kr": "행원해변(코난해변)", "cat": "spot", "area": "舊左·杏源", "desc": "因柯南場景走紅的行院海邊。", "note": "", "gmaps": "https://www.google.com/maps/place/%E6%9D%8F%E6%BA%90%E6%B5%B7%E7%81%98+(%E6%9F%AF%E5%8D%97%E6%B5%B7%E7%81%98)/data=!4m2!3m1!1s0x350d179c3747e191:0x7a3b288b0d2e0911", "lat": 33.5575318, "lng": 126.8112241},
+{"id": 98, "name": "萬丈窟", "name_kr": "만장굴", "cat": "spot", "area": "舊左·萬丈窟", "desc": "世界最長的熔岩洞窟之一，UNESCO 世界自然遺產。", "note": "", "gmaps": "https://www.google.com/maps/place/%E8%90%AC%E4%B8%88%E7%AA%9F/data=!4m2!3m1!1s0x350d19c496216a99:0xbb66abf00c2b95a6", "lat": 33.5281972, "lng": 126.7717618},
+{"id": 99, "name": "소심한책방", "name_kr": "소심한책방", "cat": "shop", "area": "舊左·終達里", "desc": "終達里的人氣獨立書店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EC%86%8C%EC%8B%AC%ED%95%9C%EC%B1%85%EB%B0%A9/data=!4m2!3m1!1s0x350d1453d29e1905:0x70ffbddfdf31e4d1", "lat": 33.4905308, "lng": 126.9028043},
+{"id": 100, "name": "달리센트", "name_kr": "달리센트", "cat": "shop", "area": "舊左·終達里", "desc": "香氛生活小店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EB%8B%AC%EB%A6%AC%EC%84%BC%ED%8A%B8/data=!4m2!3m1!1s0x350d15e3548dc69b:0x178606cce6d5296", "lat": 33.4903833, "lng": 126.8986919},
+{"id": 101, "name": "근자c가게", "name_kr": "근자c가게", "cat": "shop", "area": "舊左·終達里", "desc": "終達里的雜貨小店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EA%B7%BC%EC%9E%90c%EA%B0%80%EA%B2%8C/data=!4m2!3m1!1s0x350d1452b1503ef5:0xdeb8f74501bfee7a", "lat": 33.4959526, "lng": 126.9013236}
 ];
 
-const CATS = [
-  { key:'all',  label:'全部',  cls:'bg-slate-800 text-white',  tag:'bg-slate-100 text-slate-600' },
-  { key:'spot', label:'景點',  cls:'bg-sea-600 text-white',    tag:'bg-sea-100 text-sea-700' },
-  { key:'food', label:'吃喝',  cls:'bg-orange-500 text-white', tag:'bg-orange-100 text-orange-700' },
-  { key:'cafe', label:'咖啡甜點', cls:'bg-amber-500 text-white', tag:'bg-amber-100 text-amber-700' },
-  { key:'shop', label:'購物',  cls:'bg-emerald-500 text-white',tag:'bg-emerald-100 text-emerald-700' },
-];
-const catOf = k => CATS.find(c => c.key === k) || CATS[0];
-
-let activeCat = 'all';
-let keyword = '';
-
-/* ===================== Naver Map 導航 ===================== */
+/* =========================================================
+   Naver Map / Google Maps
+   ========================================================= */
 function launchNaver(scheme, web) {
-  let leftPage = false;
-  const mark = () => { leftPage = true; };
+  let left = false;
+  const mark = () => { left = true; };
   const onVis = () => { if (document.hidden) mark(); };
-
   document.addEventListener('visibilitychange', onVis);
   window.addEventListener('pagehide', mark);
   window.addEventListener('blur', mark);
-
   const cleanup = () => {
     document.removeEventListener('visibilitychange', onVis);
     window.removeEventListener('pagehide', mark);
     window.removeEventListener('blur', mark);
   };
-
-  window.location.href = scheme;                 // 嘗試喚醒 Naver Map App
-
-  setTimeout(() => {                             // Fallback：1.5 秒沒離開本頁就開網頁版
+  window.location.href = scheme;                    // 嘗試喚醒 Naver Map App
+  setTimeout(() => {                                // 1.5 秒沒離開本頁 → 開網頁版
     cleanup();
-    if (leftPage || document.hidden) return;
+    if (left || document.hidden) return;
     window.location.href = web;
   }, 1500);
 }
-
-function openNaver(id) {
-  const p = PLACES.find(x => x.id === id);
-  if (!p) return;
-  const dname = encodeURIComponent(p.name_kr);
-  launchNaver(
-    `nmap://route/public?dlat=${p.lat}&dlng=${p.lng}&dname=${dname}&appname=JejuTrip`,
-    `https://map.naver.com/v5/directions/-/=${p.lng},${p.lat},${dname}/-/transit`
-  );
+function navRoute(lat, lng, kr) {
+  const d = encodeURIComponent(kr);
+  launchNaver(`nmap://route/public?dlat=${lat}&dlng=${lng}&dname=${d}&appname=JejuTrip`,
+              `https://map.naver.com/v5/directions/-/=${lng},${lat},${d}/-/transit`);
 }
-
-// 清單裡沒有座標的地點（偶來市場、涉地可支…）：交給 Naver 自己用韓文名找
-function openNaverSearch(nameKr) {
-  const q = encodeURIComponent(nameKr);
-  launchNaver(`nmap://search?query=${q}&appname=JejuTrip`, `https://map.naver.com/p/search/${q}`);
+function navSearch(q) {
+  const s = encodeURIComponent(q);
+  launchNaver(`nmap://search?query=${s}&appname=JejuTrip`, `https://map.naver.com/p/search/${s}`);
 }
-
-/* ===================== 複製韓文名 ===================== */
-async function copyKr(id) {
+function naverById(id) {
   const p = PLACES.find(x => x.id === id);
-  if (!p) return;
-  try {
-    await navigator.clipboard.writeText(p.name_kr);
-  } catch (e) {
+  if (p) navRoute(p.lat, p.lng, p.name_kr);
+}
+function copyKr(id) {
+  const p = PLACES.find(x => x.id === id);
+  if (p) copyText(p.name_kr);
+}
+async function copyText(t) {
+  try { await navigator.clipboard.writeText(t); }
+  catch (e) {
     const ta = document.createElement('textarea');
-    ta.value = p.name_kr;
-    ta.style.position = 'fixed';
-    ta.style.opacity = '0';
-    document.body.appendChild(ta);
-    ta.select();
+    ta.value = t; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
     try { document.execCommand('copy'); } catch (_) {}
     ta.remove();
   }
-  toast('已複製「' + p.name_kr + '」');
+  toast('已複製：' + t);
 }
-
 let toastTimer;
 function toast(msg) {
   const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.style.opacity = '1';
+  el.textContent = msg; el.style.opacity = '1';
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { el.style.opacity = '0'; }, 1800);
+  toastTimer = setTimeout(() => { el.style.opacity = '0'; }, 1900);
 }
 
-/* ===================== 渲染 ===================== */
+/* =========================================================
+   分頁 1：行程
+   ========================================================= */
+const hairline = '<div class="h-px bg-ink-line/70 ml-[62px] my-3"></div>';
+
+function renderPlan() {
+  document.getElementById('daynav').innerHTML = TRIP.map((d, i) => `
+    <button onclick="gotoDay(${i})" data-i="${i}"
+      class="dayPill shrink-0 flex flex-col items-center leading-none px-4 py-2 rounded-2xl ring-1 transition-colors">
+      <span class="font-display text-[13px] font-extrabold tnum">${d.date.slice(5)}</span>
+      <span class="text-[10px] mt-1">${WD[d.wd]}</span>
+    </button>`).join('');
+
+  document.getElementById('days').innerHTML = TRIP.map((d, i) => {
+    const closedToday = d.items.some(x => x.closed === d.wd);
+    return `
+    <article id="day-${i}" class="fade-in glass backdrop-blur-md ring-1 ring-white/70 shadow-sm rounded-4xl overflow-hidden">
+
+      <div class="flex items-center gap-3.5 px-4 pt-4 pb-3.5">
+        <div class="shrink-0 arch-tile w-11 h-[52px] bg-forest text-lime flex flex-col items-center justify-center gap-0.5">
+          <span class="font-mono text-[8.5px] tracking-[0.1em] opacity-80">DAY</span>
+          <span class="font-display text-[17px] font-extrabold leading-none">${i + 1}</span>
+        </div>
+        <div class="min-w-0 flex-1">
+          <p class="font-display text-[19px] font-extrabold text-forest leading-none tnum">${d.date.slice(5)}
+            <span class="text-[12px] font-bold text-ink-mid ml-1">星期${WD[d.wd]}</span></p>
+          <p class="text-[11.5px] text-sage-deep font-medium mt-1.5">${d.zones.map(z => '【' + z + '】').join('')}</p>
+        </div>
+      </div>
+
+      ${d.warn || closedToday ? `<div class="flex flex-wrap gap-1.5 px-4 pb-3">
+        ${d.warn ? `<span class="text-[10.5px] font-bold bg-lime-soft text-lime-deep rounded-lg px-2 py-1">${d.warn}</span>` : ''}
+        ${closedToday ? `<span class="text-[10.5px] font-bold bg-clay/12 text-clay rounded-lg px-2 py-1">有店家今天公休</span>` : ''}
+      </div>` : ''}
+
+      <div class="px-4 pb-4">${d.items.map(it => row(it, d)).join(hairline)}</div>
+
+      <svg class="block w-full h-4" viewBox="0 0 320 16" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0,9 C26,2 52,2 78,9 C104,16 130,16 156,9 C182,2 208,2 234,9 C260,16 286,16 312,9 L320,7 L320,16 L0,16 Z" fill="#C7D8C6" fill-opacity=".55"/>
+      </svg>
+    </article>`;
+  }).join('');
+}
+
+function row(it, day) {
+  const c = CAT[it.cat] || CAT.sight;
+  const isClosed = it.closed === day.wd;
+
+  const action =
+    it.nav && it.nav.lat
+      ? `<button onclick="navRoute(${it.nav.lat},${it.nav.lng},'${it.nav.kr}')"
+           class="shrink-0 flex items-center gap-1 bg-naver active:brightness-95 text-white text-[11px] font-bold rounded-full px-3 py-1.5">
+           ${icon('nav', 'w-3.5 h-3.5')}導航</button>`
+      : it.nav && it.nav.q
+      ? `<button onclick="navSearch('${it.nav.q}')"
+           class="shrink-0 flex items-center gap-1 bg-white ring-1 ring-naver/45 active:bg-naver/10 text-naver text-[11px] font-bold rounded-full px-3 py-1.5">
+           ${icon('search', 'w-3.5 h-3.5')}搜尋</button>`
+      : '';
+
+  const copyBtn = it.copy
+    ? `<button onclick="copyText('${it.copy.replace(/'/g, "\\'")}')" aria-label="複製地址"
+         class="shrink-0 w-8 h-8 flex items-center justify-center bg-white ring-1 ring-ink-line active:bg-paper text-ink-mid rounded-full">
+         ${icon('copy', 'w-4 h-4')}</button>`
+    : '';
+
+  return `
+    <div class="flex items-start gap-3.5">
+      <div class="shrink-0 w-11 h-11 rounded-full ${TONE[c.tone]} flex items-center justify-center">
+        ${icon(c.icon, 'w-[19px] h-[19px]')}
+      </div>
+
+      <div class="min-w-0 flex-1">
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <span class="font-mono text-[9.5px] tracking-[0.14em] uppercase text-ink-dim">${c.label}</span>
+          ${it.rain ? `<span class="text-[9.5px] font-bold bg-sage-tint text-sage-deep rounded px-1.5">雨備</span>` : ''}
+          ${(it.tags || []).map(t => `<span class="text-[9.5px] font-bold bg-forest text-lime rounded px-1.5">${t}</span>`).join('')}
+        </div>
+
+        <p class="text-[14.5px] font-bold text-forest leading-snug mt-1">${it.title}</p>
+        ${it.dish ? `<p class="text-[12px] text-clay font-medium mt-0.5">${it.dish}</p>` : ''}
+        ${it.kr ? `<p class="font-mono text-[10.5px] text-ink-dim mt-0.5">${it.kr}</p>` : ''}
+        ${it.note ? `<p class="text-[12px] text-ink-mid mt-1 leading-relaxed">${it.note}</p>` : ''}
+
+        ${it.hours || typeof it.closed === 'number' ? `<div class="flex flex-wrap gap-1.5 mt-1.5">
+          ${it.hours ? `<span class="font-mono text-[10px] bg-paper text-ink-mid ring-1 ring-ink-line rounded px-1.5 py-0.5">${it.hours}</span>` : ''}
+          ${typeof it.closed === 'number'
+            ? `<span class="text-[10px] font-bold rounded px-1.5 py-0.5 ${isClosed ? 'bg-clay text-white' : 'bg-paper text-ink-mid ring-1 ring-ink-line'}">
+                 星期${WD[it.closed]}公休${isClosed ? '（就是今天）' : ''}</span>` : ''}
+        </div>` : ''}
+      </div>
+
+      <div class="flex flex-col gap-1.5 items-end">${action}${copyBtn}</div>
+    </div>`;
+}
+
+function markDay(i) {
+  document.querySelectorAll('.dayPill').forEach(b => {
+    const on = +b.dataset.i === i;
+    b.className = 'dayPill shrink-0 flex flex-col items-center leading-none px-4 py-2 rounded-2xl ring-1 transition-colors ' +
+      (on ? 'bg-forest text-lime ring-forest' : 'bg-white/70 text-ink-mid ring-white/80');
+    b.querySelector('span:last-child').className = 'text-[10px] mt-1 ' + (on ? 'text-lime/75' : 'text-ink-dim');
+  });
+}
+function gotoDay(i) {
+  document.getElementById('day-' + i).scrollIntoView({ behavior: 'smooth', block: 'start' });
+  markDay(i);
+}
+function watchDays() {
+  if (!('IntersectionObserver' in window)) return;
+  const io = new IntersectionObserver(entries => {
+    const vis = entries.filter(e => e.isIntersecting)
+                       .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+    if (vis.length) markDay(+vis[0].target.id.split('-')[1]);
+  }, { rootMargin: '-84px 0px -55% 0px', threshold: 0 });
+  document.querySelectorAll('#days > article').forEach(el => io.observe(el));
+}
+
+/* =========================================================
+   分頁 2：地點清單
+   ========================================================= */
+let activeCat = 'all';
+let keyword = '';
+
 function renderPills() {
   const counts = { all: PLACES.length };
   PLACES.forEach(p => counts[p.cat] = (counts[p.cat] || 0) + 1);
 
-  document.getElementById('pills').innerHTML = CATS.map(c => {
+  document.getElementById('pills').innerHTML = PCATS.map(c => {
     const on = c.key === activeCat;
     return `<button data-cat="${c.key}"
-      class="pill shrink-0 px-4 py-1.5 rounded-full text-[13px] font-semibold transition-all duration-150 border
-        ${on ? c.cls + ' border-transparent shadow-sm' : 'bg-white text-slate-500 border-slate-200'}">
-      ${c.label}<span class="${on ? 'opacity-70' : 'opacity-50'} ml-1 text-[11px]">${counts[c.key] || 0}</span>
+      class="pill shrink-0 flex items-center gap-1.5 rounded-full pl-2.5 pr-3.5 py-1.5 ring-1 transition-colors
+        ${on ? 'bg-forest text-lime ring-forest' : 'bg-white/70 text-ink-mid ring-white/80'}">
+      ${icon(c.icon, 'w-3.5 h-3.5')}
+      <span class="text-[12.5px] font-bold">${c.label}</span>
+      <span class="font-mono text-[10px] ${on ? 'text-lime/70' : 'text-ink-dim'}">${counts[c.key] || 0}</span>
     </button>`;
   }).join('');
 
   document.querySelectorAll('.pill').forEach(b => b.onclick = () => {
     activeCat = b.dataset.cat;
-    renderPills();
-    renderCards();
+    renderPills(); renderCards();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 }
@@ -349,293 +1023,89 @@ function renderCards() {
   const list = PLACES.filter(p => {
     if (activeCat !== 'all' && p.cat !== activeCat) return false;
     if (!kw) return true;
-    return (p.name + ' ' + p.name_kr + ' ' + p.area + ' ' + p.desc + ' ' + (p.note || ''))
-             .toLowerCase().includes(kw);
+    return (p.name + ' ' + p.name_kr + ' ' + p.area + ' ' + p.desc + ' ' + (p.note || '')).toLowerCase().includes(kw);
   });
 
   document.getElementById('count').textContent = list.length;
 
   if (!list.length) {
     document.getElementById('cards').innerHTML =
-      `<div class="text-center py-20 text-slate-400 text-sm">找不到符合的地點<br><span class="text-xs">試試其他關鍵字</span></div>`;
+      `<div class="text-center py-20 text-ink-dim text-sm">找不到符合的地點<br><span class="text-xs">試試其他關鍵字</span></div>`;
     return;
   }
 
   document.getElementById('cards').innerHTML = list.map(p => {
-    const c = catOf(p.cat);
+    const c = pcat(p.cat);
     return `
-    <article class="fade-in bg-white rounded-2xl shadow-card border border-slate-100 p-4">
-      <div class="flex items-start justify-between gap-3">
-        <div class="min-w-0">
-          <h2 class="font-bold text-[15px] leading-snug text-slate-900 break-words">${p.name}</h2>
-          ${p.name_kr !== p.name ? `<p class="text-xs text-slate-400 mt-0.5">${p.name_kr}</p>` : ''}
+    <article class="fade-in glass backdrop-blur-md ring-1 ring-white/70 shadow-sm rounded-4xl p-4">
+      <div class="flex items-start gap-3.5">
+        <div class="shrink-0 arch-tile w-11 h-[52px] ${TONE[c.tone]} flex items-center justify-center">
+          ${icon(c.icon, 'w-[19px] h-[19px]')}
         </div>
-        <span class="shrink-0 text-[11px] font-semibold px-2.5 py-1 rounded-full ${c.tag}">${c.label}</span>
+        <div class="min-w-0 flex-1">
+          <p class="text-[14.5px] font-bold text-forest leading-snug break-words">${p.name}</p>
+          ${p.name_kr !== p.name ? `<p class="font-mono text-[10.5px] text-ink-dim mt-0.5">${p.name_kr}</p>` : ''}
+          <p class="text-[11px] text-sage-deep font-medium mt-1 flex items-center gap-1">
+            ${icon('pin', 'w-3 h-3')}${p.area}</p>
+        </div>
+        <span class="shrink-0 font-mono text-[9.5px] tracking-[0.12em] uppercase text-ink-dim">${c.label}</span>
       </div>
 
-      <p class="text-[13px] text-slate-600 leading-relaxed mt-2.5">${p.desc}</p>
-
-      ${p.note && !p.desc.includes(p.note) ? `<p class="mt-2 text-[12px] text-sea-700 bg-sea-50 border border-sea-100 rounded-lg px-2.5 py-1.5 leading-relaxed">
-          <span class="font-semibold">筆記</span>　${p.note}</p>` : ''}
-
-      <div class="flex items-center gap-1.5 mt-3 text-[11px] text-slate-400">
-        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.1-7-11a7 7 0 1 1 14 0c0 4.9-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg>
-        ${p.area}
-      </div>
+      <p class="text-[12.5px] text-ink-mid leading-relaxed mt-3">${p.desc}</p>
+      ${p.note && !p.desc.includes(p.note)
+        ? `<p class="text-[12px] text-forest bg-lime-soft/70 rounded-xl px-3 py-2 mt-2.5 leading-relaxed">
+             <span class="font-bold">筆記</span>　${p.note}</p>` : ''}
 
       <div class="flex gap-2 mt-3.5">
-        <button onclick="openNaver(${p.id})"
-          class="flex-1 flex items-center justify-center gap-1.5 bg-[#03C75A] active:bg-[#02a94d] text-white text-[13px] font-bold rounded-xl py-2.5 transition-colors">
-          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-8-8 18-2-8-8-2Z"/></svg>
-          導航 (Naver Map)
+        <button onclick="naverById(${p.id})"
+          class="flex-1 flex items-center justify-center gap-1.5 bg-naver active:brightness-95 text-white text-[12.5px] font-bold rounded-full py-2.5">
+          ${icon('nav', 'w-4 h-4')}Naver 導航
         </button>
-        <button onclick="copyKr(${p.id})" title="複製韓文名"
-          class="w-11 flex items-center justify-center bg-slate-100 active:bg-slate-200 text-slate-500 rounded-xl transition-colors">
-          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
-        </button>
-        <a href="${p.gmaps}" target="_blank" rel="noopener" title="Google 地圖"
-          class="w-11 flex items-center justify-center bg-slate-100 active:bg-slate-200 text-slate-500 rounded-xl transition-colors">
-          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3 4 5v16l5-2 6 2 5-2V3l-5 2-6-2Z"/><path d="M9 3v16M15 5v16"/></svg>
+        <a href="${p.gmaps}" target="_blank" rel="noopener"
+          class="flex items-center justify-center gap-1.5 bg-gblue active:brightness-95 text-white text-[12.5px] font-bold rounded-full px-3.5 py-2.5">
+          ${icon('pin', 'w-4 h-4')}Google
         </a>
+        <button onclick="copyKr(${p.id})" aria-label="複製韓文名"
+          class="shrink-0 w-10 flex items-center justify-center bg-white ring-1 ring-ink-line active:bg-paper text-ink-mid rounded-full">
+          ${icon('copy', 'w-4 h-4')}
+        </button>
       </div>
     </article>`;
   }).join('');
 }
 
-/* ===================== 行程資料 ===================== */
-/* pid = 對應「地點清單」裡的地點；kr = 清單裡沒有、直接用韓文名叫 Naver 搜尋 */
-const WD = ['日','一','二','三','四','五','六'];
-
-const TRIP = [
-  { date:'2026/10/24', wd:6, zones:['市區','涯月'], near:['濟州市','涯月','翰林'],
-    acts:[
-      { t:'市區逛街', note:'順便買個麵包當隔天早餐', jump:'濟州市' },
-      { t:'涯月海邊', kr:'애월 한담해안산책로', note:'漢潭海岸散步路' },
-      { t:'挾才海水浴場', pid:53, note:'17:30 日落' },
-    ],
-    meals:[
-      { slot:'早午', dish:'帶魚湯麵／豬肉湯麵', pid:17, tags:['預約'], hours:'帶魚湯麵只到早上 10:00' },
-      { slot:'coffee', pid:1 },
-      { slot:'晚餐', dish:'水拌生魚片／鮑魚粥', pid:11, tags:['預約'] },
-    ]},
-
-  { date:'2026/10/25', wd:0, zones:['西歸浦'], near:['西歸浦','安德','大靜'],
-    acts:[
-      { t:'偶來市場', kr:'서귀포매일올레시장' },
-      { t:'老奶奶的年糕', pid:26, note:'偶來市場一帶' },
-      { t:'龍頭海岸', pid:77, note:'依潮位與天氣會封閉，出發前先查' },
-      { t:'沙溪海岸', pid:50 },
-      { t:'Osulloc 茶博物館', pid:78, rain:true },
-    ],
-    meals:[
-      { slot:'午餐', dish:'鮑魚石鍋飯', pid:7 },
-      { slot:'coffee' },
-      { slot:'晚餐', dish:'黑豬肉烤肉', pid:10, tags:['預約'] },
-    ]},
-
-  { date:'2026/10/26', wd:1, zones:['漢拏山','市區'], near:['漢拏山','濟州市','涯月'], stay:'換住宿',
-    acts:[
-      { t:'天娥溪谷', pid:89, note:'賞楓' },
-      { t:'御里牧路線', pid:86, note:'賞楓' },
-      { t:'天王寺', pid:88, note:'賞楓' },
-    ],
-    meals:[
-      { slot:'午餐', dish:'海螺刀削麵／餃子', pid:13, hours:'08:00–15:00', closed:0 },
-      { slot:'coffee' },
-      { slot:'晚餐', dish:'鮑魚石鍋飯／醃鮑魚／醬蟹', pid:5, tags:['預約'], closed:0 },
-    ]},
-
-  { date:'2026/10/27', wd:2, zones:['牛島'], near:['城山','牛島'], warn:'當天看天氣決定入島日期',
-    acts:[
-      { t:'城山港搭渡輪', kr:'성산항종합여객터미널' },
-      { t:'牛島', kr:'우도' },
-      { t:'城山日出峰', pid:76 },
-      { t:'涉地可支', kr:'섭지코지' },
-    ],
-    meals:[ { slot:'午餐' }, { slot:'coffee' }, { slot:'晚餐' } ]},
-
-  { date:'2026/10/28', wd:3, zones:['東北部'], near:['舊左','朝天'],
-    acts:[
-      { t:'杏源海灘（柯南海灘）', pid:97 },
-      { t:'萬丈窟', pid:98, rain:true, note:'室內' },
-      { t:'金寧海邊', pid:83 },
-      { t:'咸德海灘', pid:60 },
-    ],
-    meals:[
-      { slot:'午餐', dish:'豬肉湯麵', pid:42, hours:'10:30–15:30' },
-      { slot:'coffee', pid:44, closed:2 },
-      { slot:'晚餐', dish:'海鮮生魚片（鯖魚、蝦）', pid:19, tags:['預約'] },
-    ]},
-
-  { date:'2026/10/29', wd:4, zones:['市區','東部'], near:['濟州市'], stay:'11:00 退房',
-    acts:[
-      { t:'濟州大學銀杏大道', pid:85 },
-      { t:'濟州大學路 102', pid:84, note:'銀杏行道樹' },
-      { t:'市區', jump:'濟州市' },
-    ],
-    meals:[
-      { slot:'午餐', dish:'橘子蕎麥麵', pid:9, tags:['預約'], hours:'10:30–17:00' },
-      { slot:'coffee' },
-      { slot:'晚餐' },
-    ]},
-];
-
-const SLOT_STYLE = {
-  '早午':   'bg-sky-100 text-sky-700',
-  '午餐':   'bg-orange-100 text-orange-700',
-  'coffee': 'bg-amber-100 text-amber-700',
-  '晚餐':   'bg-rose-100 text-rose-700',
-};
-
-const P = id => PLACES.find(x => x.id === id);
-const shortDate = d => d.slice(5).replace('/', '/');
-
-/* ===================== 行程渲染 ===================== */
-function renderPlan() {
-  document.getElementById('daynav').innerHTML = TRIP.map((d, i) => `
-    <button onclick="gotoDay(${i})"
-      class="shrink-0 flex flex-col items-center leading-none px-3.5 py-1.5 rounded-xl bg-white border border-slate-200 text-slate-600">
-      <span class="text-[13px] font-bold">${shortDate(d.date)}</span>
-      <span class="text-[10px] text-slate-400 mt-0.5">${WD[d.wd]}</span>
-    </button>`).join('');
-
-  document.getElementById('days').innerHTML = TRIP.map((d, i) => {
-    const closedWarn = d.meals.some(m => m.closed === d.wd);
-    return `
-    <article id="day-${i}" class="bg-white rounded-2xl shadow-card border border-slate-100 overflow-hidden">
-
-      <div class="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-sea-50 to-white border-b border-slate-100">
-        <div class="shrink-0 text-center">
-          <p class="text-[10px] font-bold text-sea-600 tracking-wider">DAY ${i + 1}</p>
-          <p class="text-lg font-bold text-slate-900 leading-tight" style="font-variant-numeric:tabular-nums">${shortDate(d.date)}</p>
-        </div>
-        <div class="w-px h-8 bg-slate-200"></div>
-        <div class="min-w-0 flex-1">
-          <p class="text-[13px] font-bold text-slate-800">星期${WD[d.wd]}　<span class="text-slate-400 font-semibold">${d.zones.map(z => '【' + z + '】').join('')}</span></p>
-          <div class="flex flex-wrap gap-1 mt-1">
-            ${d.stay ? `<span class="text-[10px] font-bold bg-slate-800 text-white rounded px-1.5 py-0.5">${d.stay}</span>` : ''}
-            ${d.warn ? `<span class="text-[10px] font-bold bg-amber-100 text-amber-800 rounded px-1.5 py-0.5">${d.warn}</span>` : ''}
-            ${closedWarn ? `<span class="text-[10px] font-bold bg-rose-100 text-rose-700 rounded px-1.5 py-0.5">有店家今天公休</span>` : ''}
-          </div>
-        </div>
-      </div>
-
-      <div class="px-4 py-3">
-        <p class="text-[10px] font-bold tracking-[0.15em] text-slate-400 mb-2">行程</p>
-        <div class="space-y-1.5">${d.acts.map(a => actRow(a)).join('')}</div>
-      </div>
-
-      <div class="px-4 pb-4 pt-1 border-t border-slate-100">
-        <p class="text-[10px] font-bold tracking-[0.15em] text-slate-400 mb-2 mt-2">用餐</p>
-        <div class="space-y-2">${d.meals.map(m => mealRow(m, d)).join('')}</div>
-      </div>
-    </article>`;
-  }).join('');
-}
-
-function actRow(a) {
-  const p = a.pid ? P(a.pid) : null;
-  const label = p ? p.name : a.t;
-  const kr = p ? p.name_kr : (a.kr || '');
-  const btn = p   ? `<button onclick="openNaver(${p.id})" ${navBtn('導航')}`
-            : a.kr ? `<button onclick="openNaverSearch('${a.kr}')" ${navBtn('搜尋')}`
-            : a.jump ? `<button onclick="jumpToArea('${a.jump}')"
-                  class="shrink-0 bg-slate-100 active:bg-slate-200 text-slate-600 text-[11px] font-bold rounded-lg px-2.5 py-1.5">看清單</button>`
-            : '';
-  return `
-    <div class="flex items-start gap-2.5">
-      <span class="mt-1.5 w-1.5 h-1.5 rounded-full bg-sea-400 shrink-0"></span>
-      <div class="min-w-0 flex-1">
-        <p class="text-[13.5px] font-semibold text-slate-800 leading-snug">
-          ${a.t}${a.rain ? '<span class="ml-1.5 text-[10px] font-bold bg-sea-100 text-sea-700 rounded px-1.5 py-0.5">雨備</span>' : ''}
-        </p>
-        ${(p && p.name !== a.t) || a.kr ? `<p class="text-[11px] text-slate-400 mt-0.5">${kr}</p>` : ''}
-        ${a.note ? `<p class="text-[11.5px] text-slate-500 mt-0.5 leading-relaxed">${a.note}</p>` : ''}
-      </div>
-      ${btn}
-    </div>`;
-}
-
-function navBtn(text) {
-  return `class="shrink-0 bg-[#03C75A] active:bg-[#02a94d] text-white text-[11px] font-bold rounded-lg px-2.5 py-1.5">${text}</button>`;
-}
-
-function mealRow(m, d) {
-  const p = m.pid ? P(m.pid) : null;
-  const slotChip = `<span class="shrink-0 w-14 text-center text-[11px] font-bold rounded-lg py-1 ${SLOT_STYLE[m.slot] || 'bg-slate-100 text-slate-600'}">${m.slot}</span>`;
-  const isClosed = m.closed === d.wd;
-
-  if (!p) {
-    const want = m.slot === 'coffee' ? 'cafe' : 'food';
-    const sug = PLACES.filter(x => x.cat === want && d.near.some(k => x.area.startsWith(k))).slice(0, 3);
-    return `
-      <div class="flex items-start gap-2.5">
-        ${slotChip}
-        <div class="min-w-0 flex-1">
-          <p class="text-[12.5px] text-slate-400 font-medium">未定${m.dish ? ' · ' + m.dish : ''}</p>
-          ${sug.length ? `<div class="flex flex-wrap gap-1.5 mt-1.5">
-            ${sug.map(s => `<button onclick="openNaver(${s.id})"
-              class="text-[11px] bg-slate-50 border border-slate-200 active:bg-slate-100 rounded-lg px-2 py-1 text-slate-600 max-w-full truncate">
-              ${s.name}</button>`).join('')}
-            </div>
-            <p class="text-[10.5px] text-slate-400 mt-1">↑ 這一帶清單裡的選擇，點了直接導航</p>` : ''}
-        </div>
-      </div>`;
-  }
-
-  return `
-    <div class="flex items-start gap-2.5">
-      ${slotChip}
-      <div class="min-w-0 flex-1">
-        ${m.dish ? `<p class="text-[11px] text-slate-400 font-medium">${m.dish}</p>` : ''}
-        <p class="text-[13.5px] font-bold text-slate-900 leading-snug">${p.name}</p>
-        <p class="text-[11px] text-slate-400">${p.name_kr} · ${p.area}</p>
-        <div class="flex flex-wrap gap-1 mt-1.5">
-          ${(m.tags || []).map(t => `<span class="text-[10px] font-bold bg-sea-100 text-sea-700 rounded px-1.5 py-0.5">${t}</span>`).join('')}
-          ${m.hours ? `<span class="text-[10px] font-bold bg-slate-100 text-slate-600 rounded px-1.5 py-0.5">${m.hours}</span>` : ''}
-          ${typeof m.closed === 'number'
-              ? `<span class="text-[10px] font-bold rounded px-1.5 py-0.5 ${isClosed ? 'bg-rose-500 text-white' : 'bg-slate-100 text-slate-600'}">
-                   星期${WD[m.closed]}公休${isClosed ? '（就是今天）' : ''}</span>` : ''}
-        </div>
-      </div>
-      <button onclick="openNaver(${p.id})" ${navBtn('導航')}
-    </div>`;
-}
-
-function gotoDay(i) {
-  document.getElementById('day-' + i).scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-function jumpToArea(area) {
-  activeCat = 'all';
-  keyword = area;
-  document.getElementById('search').value = area;
-  renderPills();
+document.getElementById('search').addEventListener('input', e => {
+  keyword = e.target.value;
+  if (keyword.trim() && activeCat !== 'all') { activeCat = 'all'; renderPills(); }  // 打字時解除類別篩選
   renderCards();
-  switchTab('list');
-  window.scrollTo({ top: 0 });
-}
+});
 
-/* ===================== 分頁切換 ===================== */
+/* =========================================================
+   分頁切換
+   ========================================================= */
 function switchTab(tab) {
   document.getElementById('app').dataset.view = tab;
-  document.querySelectorAll('.nav-btn').forEach(b => {
+  document.querySelectorAll('.navBtn').forEach((b, i) => {
     const on = b.dataset.tab === tab;
-    b.classList.toggle('text-sea-600', on);
-    b.classList.toggle('text-slate-400', !on);
+    b.className = 'navBtn flex-1 flex items-center justify-center gap-2 rounded-full py-2.5 transition-colors ' +
+      (on ? 'bg-forest text-lime' : 'text-ink-mid');
+    b.querySelector('.navIcon').innerHTML = icon(i === 0 ? 'calendar' : 'list', 'w-[18px] h-[18px]');
   });
   window.scrollTo({ top: 0 });
 }
-document.querySelectorAll('.nav-btn').forEach(b => b.onclick = () => switchTab(b.dataset.tab));
+document.querySelectorAll('.navBtn').forEach(b => b.onclick = () => switchTab(b.dataset.tab));
 
-/* ===================== 啟動 ===================== */
-document.getElementById('search').addEventListener('input', e => {
-  keyword = e.target.value;
-  renderCards();
-});
+/* =========================================================
+   啟動
+   ========================================================= */
+document.getElementById('searchIcon').innerHTML = icon('search', 'w-4 h-4');
+renderPlan();
+markDay(0);
+watchDays();
 renderPills();
 renderCards();
-renderPlan();
+switchTab('plan');
+
 </script>
 </body>
 </html>
