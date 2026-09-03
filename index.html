@@ -144,10 +144,6 @@ window.tailwind && (tailwind.config = {
           </g>
         </svg>
         <div class="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-forest/75 via-forest/35 to-transparent"></div>
-        <div class="absolute inset-x-0 bottom-0 p-4">
-          <p class="font-display text-[15px] font-extrabold text-paper-warm">濟州島 · 楓葉與海</p>
-          <p class="font-mono text-[10px] tracking-[0.16em] text-paper-warm/80 mt-0.5">38 STOPS · 6 DAYS</p>
-        </div>
       </div>
     </header>
 
@@ -163,7 +159,7 @@ window.tailwind && (tailwind.config = {
     <header class="px-5 pt-8">
       <p class="font-mono text-[10px] tracking-[0.32em] text-sage-deep">SAVED PLACES</p>
       <div class="flex items-end justify-between mt-1">
-        <h1 class="font-display text-[34px] font-extrabold leading-none tracking-[-0.02em] text-forest">地點清單</h1>
+        <h1 class="font-display text-[34px] font-extrabold leading-none tracking-[-0.02em] text-forest">LIST</h1>
         <p class="font-mono text-[11px] text-ink-dim pb-1"><span id="count">0</span> / 101</p>
       </div>
 
@@ -260,8 +256,8 @@ const CAT = {
 const PCATS = [
   { key:'all',  label:'全部',     icon:'list',     tone:'plain'  },
   { key:'spot', label:'景點',     icon:'camera',   tone:'nature' },
-  { key:'food', label:'吃喝',     icon:'utensils', tone:'meal'   },
-  { key:'cafe', label:'咖啡甜點', icon:'coffee',   tone:'sweet'  },
+  { key:'food', label:'餐廳',     icon:'utensils', tone:'meal'   },
+  { key:'cafe', label:'咖啡廳', icon:'coffee',   tone:'sweet'  },
   { key:'shop', label:'購物',     icon:'bag',      tone:'warm'   },
 ];
 const pcat = k => PCATS.find(c => c.key === k) || PCATS[0];
@@ -294,7 +290,7 @@ const TRIP = [
     "tags": [
      "預約"
     ],
-    "hours": "帶魚湯麵只到早上 10:00",
+    "hours": "帶魚湯麵早上10:00供應",
     "nav": {
      "lat": 33.5064195,
      "lng": 126.509232,
@@ -303,8 +299,7 @@ const TRIP = [
    },
    {
     "cat": "shop",
-    "title": "市區逛街",
-    "note": "順便買個麵包當隔天早餐"
+    "title": "市區逛街"
    },
    {
     "cat": "beach",
@@ -319,7 +314,6 @@ const TRIP = [
     "cat": "cafe",
     "title": "베릴 Beryl",
     "kr": "베릴",
-    "note": "No kids — 13 歲以下不可入場",
     "nav": {
      "lat": 33.3975848,
      "lng": 126.2425697,
