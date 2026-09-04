@@ -5,12 +5,33 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#F3F5F2">
 <title>JEJU 2026</title>
+<meta name="description" content="我們10月濟州島見~~~">
+
+<!-- ===== LINE / 社群分享預覽（Open Graph）=====
+     圖片與內文由這一段決定。share-cover.jpg 要放在跟 index.html 同一層。
+     網址若換位置，把下面 4 個 https://... 一起改掉。 -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="JEJU 2026">
+<meta property="og:title" content="JEJU 2026">
+<meta property="og:description" content="我們10月濟州島見~~~">
+<meta property="og:url" content="https://zona-chi.github.io/jeju-trip/">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://zona-chi.github.io/jeju-trip/share-cover.jpg">
+<meta property="og:image:secure_url" content="https://zona-chi.github.io/jeju-trip/share-cover.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="JEJU 2026 · 10/24–10/29 濟州島行程">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="JEJU 2026">
+<meta name="twitter:description" content="我們10月濟州島見~~~">
+<meta name="twitter:image" content="https://zona-chi.github.io/jeju-trip/share-cover.jpg">
+<!-- ===== / 分享預覽 ===== -->
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=IBM+Plex+Mono:wght@500;600&family=Noto+Sans+TC:wght@400;500;700&display=swap">
 <script src="https://cdn.tailwindcss.com"></script>
-<meta property="og:description" content="我們濟州島見~~~" />
-<meta property="og:image" content="https://zona-chi.github.io/jeju-trip/share-cover.jpg" />
 <script>
 window.tailwind && (tailwind.config = {
   theme: { extend: {
@@ -83,12 +104,121 @@ window.tailwind && (tailwind.config = {
   @keyframes fade { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
   .tnum { font-variant-numeric: tabular-nums; }
 </style>
+<style>
+  /* ============================================================
+     環境動態特效（Ambient Animations）
+     背景與等高線用 transform；天空漸層用 background-position 流動。
+     ============================================================ */
+
+  /* --- 1. 頁面背景光暈飄移 --- */
+  @keyframes deco-drift {
+    0%   { transform: translate3d(0, 0, 0)      scale(1);    }
+    25%  { transform: translate3d(-5%, 3.5%, 0) scale(1.10); }
+    50%  { transform: translate3d(3.5%, 6%, 0)  scale(1.18); }
+    75%  { transform: translate3d(5%, -3%, 0)   scale(1.09); }
+    100% { transform: translate3d(0, 0, 0)      scale(1);    }
+  }
+  .deco-blobs { inset: -26%; will-change: transform; animation: deco-drift 14s ease-in-out infinite; }
+
+  /* --- 2. 等高線紋理浮動 --- */
+  @keyframes topo-float-a {
+    from { transform: translate3d(0, -28px, 0)   rotate(-3deg) scale(1);    }
+    to   { transform: translate3d(18px, 26px, 0) rotate(3deg)  scale(1.08); }
+  }
+  @keyframes topo-float-b {
+    from { transform: translate3d(0, 30px, 0)      rotate(2.5deg)  scale(1.06); }
+    to   { transform: translate3d(-22px, -24px, 0) rotate(-2.5deg) scale(1);    }
+  }
+  .anim-topo    { will-change: transform; }
+  .anim-topo--a { animation: topo-float-a 7s   ease-in-out infinite alternate; }
+  .anim-topo--b { animation: topo-float-b 8.5s ease-in-out infinite alternate; }
+
+  /* --- 3. 拱形天空：漸層本身在流動 --- */
+  @keyframes sky-flow {
+    0%   { background-position: 0% 42%;   }
+    50%  { background-position: 100% 58%; }
+    100% { background-position: 0% 42%;   }
+  }
+  .arch-sky {
+    background-image: linear-gradient(118deg,
+      #FBFBF8 0%, #F2F6F1 22%, #E6EFEA 40%, #EDF3EC 58%, #F7FAF6 78%, #FBFBF8 100%);
+    background-size: 260% 260%;
+    animation: sky-flow 20s ease-in-out infinite;
+  }
+
+  /* --- 4. 太陽：沿拱形東昇西落，22 秒一輪 --- */
+  @keyframes sun-orbit {
+    0%     { transform: translate(30.0px, 206.0px); }
+    8.33%  { transform: translate(35.1px, 167.2px); }
+    16.67% { transform: translate(50.1px, 131.0px); }
+    25%    { transform: translate(73.9px, 99.9px); }
+    33.33% { transform: translate(105.0px, 76.1px); }
+    41.67% { transform: translate(141.2px, 61.1px); }
+    50%    { transform: translate(180.0px, 56.0px); }
+    58.33% { transform: translate(218.8px, 61.1px); }
+    66.67% { transform: translate(255.0px, 76.1px); }
+    75%    { transform: translate(286.1px, 99.9px); }
+    83.33% { transform: translate(309.9px, 131.0px); }
+    91.67% { transform: translate(324.9px, 167.2px); }
+    100%   { transform: translate(330.0px, 206.0px); }
+  }
+  /* 大小與顏色：地平線附近偏橘、偏大、偏淡；正午轉萊姆黃綠、最亮最小 */
+  @keyframes sun-cycle {
+    0%   { fill: #E0843A; opacity: 0;   transform: scale(1.25); }
+    5%   { fill: #E0843A; opacity: .28; transform: scale(1.22); }
+    14%  { fill: #E4913C; opacity: .78; transform: scale(1.15); }
+    28%  { fill: #DFB840; opacity: .95; transform: scale(1.05); }
+    42%  { fill: #CFDC3E; opacity: 1;   transform: scale(.97);  }
+    50%  { fill: #C8E63C; opacity: 1;   transform: scale(.95);  }
+    58%  { fill: #CFDC3E; opacity: 1;   transform: scale(.97);  }
+    72%  { fill: #DFB840; opacity: .95; transform: scale(1.05); }
+    86%  { fill: #E4913C; opacity: .78; transform: scale(1.15); }
+    95%  { fill: #E0843A; opacity: .28; transform: scale(1.22); }
+    100% { fill: #E0843A; opacity: 0;   transform: scale(1.25); }
+  }
+  .anim-sun-orbit { animation: sun-orbit 22s linear infinite; will-change: transform; }
+  .anim-sun-color { animation: sun-cycle 22s ease-in-out infinite; }
+
+  /* --- 5. 晨昏暖光：跟著太陽的位置左右交替 --- */
+  @keyframes glow-am {
+    0% { opacity: .5; } 15% { opacity: .42; } 35% { opacity: .08; } 50%, 100% { opacity: 0; }
+  }
+  @keyframes glow-pm {
+    0%, 50% { opacity: 0; } 65% { opacity: .08; } 85% { opacity: .42; } 100% { opacity: .5; }
+  }
+  .arch-glow-am {
+    background: radial-gradient(62% 72% at 10% 86%, rgba(224,132,58,.55), transparent 70%);
+    animation: glow-am 22s ease-in-out infinite;
+  }
+  .arch-glow-pm {
+    background: radial-gradient(62% 72% at 90% 86%, rgba(224,132,58,.55), transparent 70%);
+    animation: glow-pm 22s ease-in-out infinite;
+  }
+
+  /* --- 6. 雲與水波 --- */
+  @keyframes cloud-drift {
+    from { transform: translate3d(-26px, 5px, 0); }
+    to   { transform: translate3d(26px, -7px, 0); }
+  }
+  @keyframes cloud-fade { from { opacity: .55; } to { opacity: 1; } }
+  @keyframes wave-shift {
+    from { transform: translate3d(-12px, 0, 0); }
+    to   { transform: translate3d(12px, 3px, 0); }
+  }
+  .anim-cloud { animation: cloud-drift 9s ease-in-out infinite alternate,
+                           cloud-fade 5s ease-in-out infinite alternate; }
+  .anim-wave  { animation: wave-shift 4.5s ease-in-out infinite alternate; }
+
+  /* 「減少動態效果」的系統偏好由上一段 style 的 prefers-reduced-motion 統一關掉。
+     火山山體刻意不動 —— 它是整個畫面的定錨。 */
+</style>
+
 </head>
 <body>
 <!-- ===== 最底層裝飾：柔和色塊 + 等高線 ===== -->
 <div class="deco" aria-hidden="true">
   <div class="deco-blobs"></div>
-  <svg class="absolute -top-24 -right-40 w-[420px] h-[420px]" viewBox="0 0 200 200" fill="none">
+  <svg class="anim-topo anim-topo--a absolute -top-24 -right-40 w-[420px] h-[420px]" viewBox="0 0 200 200" fill="none">
     <g stroke="#7C9A80" stroke-opacity=".16" stroke-width=".8">
       <ellipse cx="100" cy="100" rx="26" ry="18" transform="rotate(-18 100 100)"/>
       <ellipse cx="100" cy="100" rx="40" ry="28" transform="rotate(-18 100 100)"/>
@@ -98,7 +228,7 @@ window.tailwind && (tailwind.config = {
       <ellipse cx="100" cy="100" rx="99" ry="71" transform="rotate(-18 100 100)"/>
     </g>
   </svg>
-  <svg class="absolute bottom-[-120px] -left-32 w-[380px] h-[380px]" viewBox="0 0 200 200" fill="none">
+  <svg class="anim-topo anim-topo--b absolute bottom-[-120px] -left-32 w-[380px] h-[380px]" viewBox="0 0 200 200" fill="none">
     <g stroke="#7C9A80" stroke-opacity=".14" stroke-width=".8">
       <ellipse cx="100" cy="100" rx="22" ry="30" transform="rotate(24 100 100)"/>
       <ellipse cx="100" cy="100" rx="35" ry="46" transform="rotate(24 100 100)"/>
@@ -125,27 +255,33 @@ window.tailwind && (tailwind.config = {
         </div>
       </div>
 
-      <!-- 拱形視覺區塊（純 SVG，沒有照片） -->
-      <div class="arch relative overflow-hidden mt-5 h-[196px] ring-1 ring-white/70 shadow-sm">
-        <svg class="absolute inset-0 w-full h-full" viewBox="0 0 360 196" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+      <!-- 拱形視覺區塊：天空漸層在容器上流動，太陽沿拱形東昇西落 -->
+      <div class="arch arch-sky relative overflow-hidden mt-5 h-64 ring-1 ring-white/70 shadow-sm">
+
+        <!-- 晨昏暖光：兩側各一層，跟太陽同一個 22 秒週期 -->
+        <div class="arch-glow-am absolute inset-0" aria-hidden="true"></div>
+        <div class="arch-glow-pm absolute inset-0" aria-hidden="true"></div>
+
+        <svg class="absolute inset-0 w-full h-full" viewBox="0 0 360 256"
+             preserveAspectRatio="xMidYMax slice" aria-hidden="true">
           <defs>
-            <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stop-color="#FAFAF7"/><stop offset="1" stop-color="#E8F0E6"/>
-            </linearGradient>
           </defs>
-          <rect width="360" height="196" fill="url(#sky)"/>
-          <circle cx="252" cy="56" r="25" fill="#C8E63C" opacity=".9"/>
-          <g stroke="#7C9A80" stroke-opacity=".28" stroke-width="1" fill="none">
-            <path d="M20,40 C34,32 46,32 60,40"/><path d="M28,50 C40,44 50,44 62,50"/>
+
+          <!-- 雲 -->
+          <g class="anim-cloud" stroke="#7C9A80" stroke-opacity=".26" stroke-width="1"
+             fill="none" stroke-linecap="round">
+            <path d="M58,60 C69,52 80,52 91,60"/><path d="M66,72 C76,66 86,66 96,72"/>
           </g>
-          <path d="M0,128 C56,92 104,102 152,126 C202,151 244,100 296,112 C324,118 344,126 360,131 L360,196 L0,196 Z" fill="#C7D8C6"/>
-          <path d="M0,154 C48,132 94,138 138,156 C188,176 230,144 278,152 C314,158 340,164 360,168 L360,196 L0,196 Z" fill="#7C9A80"/>
-          <path d="M0,178 C46,165 90,169 130,180 C178,193 224,172 270,178 C308,183 338,188 360,191 L360,196 L0,196 Z" fill="#1E3A2B"/>
-          <g stroke="#FAFAF7" stroke-opacity=".5" stroke-width="1.2" fill="none">
-            <path d="M96,186 C112,181 128,181 144,186"/><path d="M188,190 C204,185 220,185 236,190"/>
+
+          <!-- 太陽：外層沿拱形走位，內層做大小與顏色變化 -->
+          <g class="anim-sun-orbit">
+            <circle class="anim-sun-color" r="18" fill="#C8E63C"/>
           </g>
+
+          <!-- 漢拏山素材（透明背景 PNG，錐軸對齊 x=180） -->
+          <image x="44" y="78" width="277" height="178" preserveAspectRatio="xMidYMax meet"
+                 href="data:image/png;base64,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"/>
         </svg>
-        <div class="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-forest/75 via-forest/35 to-transparent"></div>
       </div>
     </header>
 
@@ -162,7 +298,7 @@ window.tailwind && (tailwind.config = {
       <p class="font-mono text-[10px] tracking-[0.32em] text-sage-deep">SAVED PLACES</p>
       <div class="flex items-end justify-between mt-1">
         <h1 class="font-display text-[34px] font-extrabold leading-none tracking-[-0.02em] text-forest">LIST</h1>
-        <p class="font-mono text-[11px] text-ink-dim pb-1"><span id="count">0</span> / 101</p>
+        <p class="font-mono text-[11px] text-ink-dim pb-1"><span id="count">0</span> / 121</p>
       </div>
 
       <div class="relative mt-4">
@@ -218,6 +354,7 @@ const ICONS = {
   copy:     '<rect x="9" y="9" width="11" height="11" rx="2.2"/><path d="M5 15V5.2A2.2 2.2 0 0 1 7.2 3H17"/>',
   pin:      '<path d="M12 21.5s-7-6.4-7-11.5a7 7 0 1 1 14 0c0 5.1-7 11.5-7 11.5Z"/><circle cx="12" cy="10" r="2.6"/>',
   calendar: '<rect x="3" y="4.6" width="18" height="16" rx="2.4"/><path d="M8 2.6v3.4M16 2.6v3.4M3 10h18"/><path d="M7.6 14h3M7.6 17.4h6"/>',
+  clock:    '<circle cx="12" cy="12" r="8.6"/><path d="M12 7.4V12l3.4 2"/>',
   list:     '<path d="M8.5 6.5H21M8.5 12H21M8.5 17.5H21"/><circle cx="3.8" cy="6.5" r="1.3" fill="currentColor" stroke="none"/><circle cx="3.8" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="3.8" cy="17.5" r="1.3" fill="currentColor" stroke="none"/>',
 };
 function icon(name, cls = 'w-5 h-5') {
@@ -256,13 +393,14 @@ const CAT = {
 
 /* ---------------- 地點清單類別 ---------------- */
 const PCATS = [
-  { key:'all',  label:'全部',     icon:'list',     tone:'plain'  },
-  { key:'spot', label:'景點',     icon:'camera',   tone:'nature' },
-  { key:'food', label:'餐廳',     icon:'utensils', tone:'meal'   },
-  { key:'cafe', label:'咖啡廳', icon:'coffee',   tone:'sweet'  },
-  { key:'shop', label:'購物',     icon:'bag',      tone:'warm'   },
+  { key:'all',    label:'全部',   icon:'list',     tone:'plain'  },
+  { key:'景點',   label:'景點',   icon:'camera',   tone:'nature' },
+  { key:'餐廳',   label:'餐廳',   icon:'utensils', tone:'meal'   },
+  { key:'咖啡廳', label:'咖啡廳', icon:'coffee',   tone:'sweet'  },
+  { key:'購物',   label:'購物',   icon:'bag',      tone:'warm'   },
 ];
-const pcat = k => PCATS.find(c => c.key === k) || PCATS[0];
+const CAT_FG = { '景點':'text-sage-deep', '餐廳':'text-forest', '咖啡廳':'text-lime-deep', '購物':'text-clay' };
+const pcat = k => PCATS.find(c => c.key === k) || PCATS[1];
 
 const WD = ['日','一','二','三','四','五','六'];
 const TRIP = [
@@ -277,12 +415,17 @@ const TRIP = [
    {
     "cat": "flight",
     "title": "班機 LJ764",
-    "note": "桃園出發"
+    "note": "桃園出發 → 濟州"
    },
    {
     "cat": "car",
     "title": "租車取車",
-    "note": "10/24 08:00 取車 → 10/29 19:00 還車"
+    "note": "08:00 · 58-7, Yonghae-ro, Jeju-si",
+    "kr": "제주시 용해로 58-7",
+    "nav": {
+     "q": "제주시 용해로 58-7"
+    },
+    "copy": "제주시 용해로 58-7"
    },
    {
     "cat": "brunch",
@@ -301,7 +444,8 @@ const TRIP = [
    },
    {
     "cat": "shop",
-    "title": "市區逛街"
+    "title": "市區逛街",
+    "note": "買麵包"
    },
    {
     "cat": "beach",
@@ -316,6 +460,7 @@ const TRIP = [
     "cat": "cafe",
     "title": "베릴 Beryl",
     "kr": "베릴",
+    "note": "No kids — 13 歲以下不可入場",
     "nav": {
      "lat": 33.3975848,
      "lng": 126.2425697,
@@ -369,6 +514,7 @@ const TRIP = [
     "cat": "sight",
     "title": "偶來市場",
     "kr": "서귀포매일올레시장",
+    "note": "老奶奶的年糕等小吃",
     "nav": {
      "q": "서귀포매일올레시장"
     }
@@ -399,7 +545,7 @@ const TRIP = [
     "cat": "sight",
     "title": "龍頭海岸",
     "kr": "용머리해안",
-    "note": "依潮位與天氣會封閉，出發前先查開放狀況",
+    "note": "依潮位與天氣會封閉，出發前先查",
     "nav": {
      "lat": 33.2316155,
      "lng": 126.3148321,
@@ -434,6 +580,7 @@ const TRIP = [
     "cat": "sight",
     "title": "Osulloc 茶博物館",
     "kr": "오설록 티 뮤지엄",
+    "note": "下雨的備案",
     "rain": true,
     "nav": {
      "lat": 33.3059385,
@@ -530,20 +677,13 @@ const TRIP = [
   "zones": [
    "牛島"
   ],
-  "warn": "當天看天氣決定入島日期",
+  "warn": "看天氣決定入島日期",
   "items": [
-   {
-    "cat": "island",
-    "title": "城山港搭渡輪",
-    "kr": "성산항종합여객터미널",
-    "nav": {
-     "q": "성산항종합여객터미널"
-    }
-   },
    {
     "cat": "island",
     "title": "牛島",
     "kr": "우도",
+    "note": "城山港搭渡輪進島",
     "nav": {
      "q": "우도"
     }
@@ -700,115 +840,145 @@ const TRIP = [
     "note": "最後採買"
    },
    {
+    "cat": "car",
+    "title": "還車",
+    "note": "19:00 · 58-7, Yonghae-ro, Jeju-si",
+    "kr": "제주시 용해로 58-7",
+    "nav": {
+     "q": "제주시 용해로 58-7"
+    },
+    "copy": "제주시 용해로 58-7"
+   },
+   {
     "cat": "flight",
     "title": "班機 LJ941",
-    "note": "返回台中"
+    "note": "濟州 → 桃園"
    }
   ]
  }
 ];
 const PLACES = [
-{"id": 1, "name": "Beryl", "name_kr": "베릴", "cat": "cafe", "area": "翰林·挾才", "desc": "挾才海邊的海景咖啡廳，店家標示為 no kids zone。", "note": "海景咖啡廳", "gmaps": "https://www.google.com/maps/place/Beryl/data=!4m2!3m1!1s0x350c61af7db1848b:0x9d67c543f09a5b29", "lat": 33.3975848, "lng": 126.2425697},
-{"id": 2, "name": "늘보의 작업실", "name_kr": "늘보의 작업실", "cat": "food", "area": "舊左·終達里", "desc": "終達里的義式早午餐小館，也供應紅酒。", "note": "", "gmaps": "https://www.google.com/maps/place/%EB%8A%98%EB%B3%B4%EC%9D%98+%EC%9E%91%EC%97%85%EC%8B%A4/data=!4m2!3m1!1s0x350d15d7fe23ebb9:0xeb137f484558cf5c", "lat": 33.4959396, "lng": 126.8998255},
-{"id": 3, "name": "가는곶 세화", "name_kr": "가는곶 세화", "cat": "cafe", "area": "舊左·細花", "desc": "細花海邊的石屋咖啡廳，氣氛安靜。", "note": "", "gmaps": "https://www.google.com/maps/place/%EA%B0%80%EB%8A%94%EA%B3%B6+%EC%84%B8%ED%99%94/data=!4m2!3m1!1s0x350d179ff0a7a4b5:0xd6a66cb5fade59e3", "lat": 33.5205393, "lng": 126.8606225},
-{"id": 4, "name": "여정", "name_kr": "여정", "cat": "food", "area": "濟州市·二徒洞", "desc": "平價私廚風韓式料理，需事先預訂。", "note": "平價私廚類 要先預訂", "gmaps": "https://www.google.com/maps/place/%EC%97%AC%EC%A0%95/data=!4m2!3m1!1s0x350cfd006a919bdf:0x96b19d38ad6241be", "lat": 33.4945631, "lng": 126.5452162},
-{"id": 5, "name": "丈母食卓", "name_kr": "장모식탁", "cat": "food", "area": "濟州市·蓮信路", "desc": "家常韓食小店，推薦直接點套餐。", "note": "推套餐", "gmaps": "https://www.google.com/maps/place/%E4%B8%88%E6%AF%8D%E9%A3%9F%E5%8D%93/data=!4m2!3m1!1s0x350cfcc98099c5db:0x599f9624485fd2a0", "lat": 33.4971067, "lng": 126.546788},
-{"id": 6, "name": "Café Delmoondo", "name_kr": "델문도", "cat": "cafe", "area": "朝天·咸德", "desc": "咸德海邊的人氣咖啡烘焙館，坐位面海。", "note": "", "gmaps": "https://www.google.com/maps/place/Caf%C3%A9+Delmoondo/data=!4m2!3m1!1s0x350d1e9961b5bd7f:0xe16f5406dbb863a4", "lat": 33.5437787, "lng": 126.6688353},
-{"id": 7, "name": "생원전복", "name_kr": "생원전복", "cat": "food", "area": "安德·和順", "desc": "鮑魚專門店，招牌是鮑魚石鍋拌飯。", "note": "鮑魚石鍋拌飯", "gmaps": "https://www.google.com/maps/place/%EC%83%9D%EC%9B%90%EC%A0%84%EB%B3%B5/data=!4m2!3m1!1s0x350c43404c90de1f:0xbf9413ca7cfd9fe4", "lat": 33.2458179, "lng": 126.3307228},
-{"id": 8, "name": "Nogorok", "name_kr": "노고록", "cat": "food", "area": "西歸浦·天帝淵", "desc": "韓食小館，口碑很好，建議一開店就到。", "note": "聽說是最好吃 要一開店就去", "gmaps": "https://www.google.com/maps/place/Nogorok/data=!4m2!3m1!1s0x350c5b001d98b959:0x146dbb4434b50966", "lat": 33.2524181, "lng": 126.4266798},
-{"id": 9, "name": "DOTOREE Kitchen", "name_kr": "도토리키친 본점", "cat": "food", "area": "濟州市·北城路", "desc": "人氣早午餐與麵食店，建議先用 CatchTable 訂位。", "note": "建議先用CatchTable預約", "gmaps": "https://www.google.com/maps/place/DOTOREE+Kitchen/data=!4m2!3m1!1s0x350d1b69963f852f:0xf01e7f2c95267210", "lat": 33.5153877, "lng": 126.5186172},
-{"id": 10, "name": "豚魚吉", "name_kr": "돈어길", "cat": "food", "area": "大靜·中山間", "desc": "黑豬肉燒烤與冷麵專門店。", "note": "", "gmaps": "https://www.google.com/maps/place/%E8%B1%9A%E9%AD%9A%E5%90%89/data=!4m2!3m1!1s0x350c5db490ee2cdb:0x88a2f71838b4064", "lat": 33.28076, "lng": 126.2854572},
-{"id": 11, "name": "靑草水水拌生魚片 濟州店", "name_kr": "청초수물회 제주점", "cat": "food", "area": "涯月", "desc": "水拌生魚片名店，鮑魚粥也受歡迎。", "note": "鮑魚粥", "gmaps": "https://www.google.com/maps/place/%E9%9D%91%E8%8D%89%E6%B0%B4%E6%B0%B4%E6%8B%8C%E7%94%9F%E9%AD%9A%E7%89%87+%E6%BF%9F%E5%B7%9E%E5%BA%97/data=!4m2!3m1!1s0x350cf5207b32f2af:0x1a62d4e02cafe156", "lat": 33.4566582, "lng": 126.3091233},
-{"id": 12, "name": "Jeomjeom", "name_kr": "점점", "cat": "cafe", "area": "朝天·新村里", "desc": "新村里海邊的安靜咖啡廳。", "note": "", "gmaps": "https://www.google.com/maps/place/Jeomjeom/data=!4m2!3m1!1s0x350d1d8148987c97:0xde6c20a901d7d411", "lat": 33.537233, "lng": 126.6153298},
-{"id": 13, "name": "Shinjeju Bomal Kalguksu", "name_kr": "신제주보말칼국수 제주본점", "cat": "food", "area": "濟州市·新濟州", "desc": "海螺刀削麵本店。", "note": "海螺刀削麵", "gmaps": "https://www.google.com/maps/place/Shinjeju+Bomal+Kalguksu/data=!4m2!3m1!1s0x350cfb0d429c8993:0xcfeb2825f3149841", "lat": 33.4879343, "lng": 126.500021},
-{"id": 14, "name": "島豚 挾才黑豬肉", "name_kr": "도돈 협재흑돼지", "cat": "food", "area": "翰林·挾才", "desc": "挾才的黑豬肉炭火燒烤。", "note": "", "gmaps": "https://www.google.com/maps/place/%E5%B3%B6%E8%B1%9A+%E6%8C%BE%E6%89%8D%E9%BB%91%E8%B1%AC%E8%82%89/data=!4m2!3m1!1s0x350c610029f6fc0b:0x6c3be7f135145ec6", "lat": 33.3947961, "lng": 126.2415901},
-{"id": 15, "name": "Haehwatang", "name_kr": "해화탕", "cat": "cafe", "area": "翰林·一周西路", "desc": "翰林一帶的咖啡廳。", "note": "", "gmaps": "https://www.google.com/maps/place/Haehwatang/data=!4m2!3m1!1s0x350cf500514505a1:0xd9457e0af0a94965", "lat": 33.4433921, "lng": 126.2915933},
-{"id": 16, "name": "오드리 김밥", "name_kr": "오드리 김밥", "cat": "food", "area": "城山", "desc": "城山日出峰附近的紫菜飯捲店，適合外帶。", "note": "", "gmaps": "https://www.google.com/maps/place/%EC%98%A4%EB%93%9C%EB%A6%AC+%EA%B9%80%EB%B0%A5/data=!4m2!3m1!1s0x350d15a1c3203a7b:0xc76a6e6d63217053", "lat": 33.4631382, "lng": 126.9334513},
-{"id": 17, "name": "Gogugsu", "name_kr": "고국수", "cat": "food", "area": "濟州市·龍門路", "desc": "麵食店，早上 10 點前才供應帶魚湯麵。", "note": "早上10點前供應帶魚湯麵", "gmaps": "https://www.google.com/maps/place/Gogugsu/data=!4m2!3m1!1s0x350cfb4f0971075f:0xd10cb09e663a435e", "lat": 33.5064195, "lng": 126.509232},
-{"id": 18, "name": "무상찻집", "name_kr": "무상찻집", "cat": "cafe", "area": "濟州市·西光路", "desc": "安靜的傳統茶館。", "note": "", "gmaps": "https://www.google.com/maps/place/%EB%AC%B4%EC%83%81%EC%B0%BB%EC%A7%91/data=!4m2!3m1!1s0x350cfb29abc600ab:0xcbe286207cde115", "lat": 33.5009806, "lng": 126.5144369},
-{"id": 19, "name": "季節食卓 咸德店", "name_kr": "계절식탁 함덕점", "cat": "food", "area": "朝天·咸德", "desc": "咸德海邊二樓的韓式定食。", "note": "", "gmaps": "https://www.google.com/maps/place/%E5%AD%A3%E7%AF%80%E9%A3%9F%E5%8D%93+%E5%92%B8%E5%BE%B7%E5%BA%97/data=!4m2!3m1!1s0x350d1f1f715a326d:0x2891ca25b75d29df", "lat": 33.5425961, "lng": 126.6674297},
-{"id": 20, "name": "Ppolsaljip", "name_kr": "뽈살집", "cat": "food", "area": "西歸浦·中央洞", "desc": "豬頰肉燒烤店。", "note": "", "gmaps": "https://www.google.com/maps/place/Ppolsaljip/data=!4m2!3m1!1s0x350c539c55c10f71:0x3295985b068bb521", "lat": 33.2508339, "lng": 126.5628867},
-{"id": 21, "name": "Iltong Iban", "name_kr": "일통이반", "cat": "food", "area": "濟州市·中央路", "desc": "市區的海鮮料理店。", "note": "", "gmaps": "https://www.google.com/maps/place/Iltong+Iban/data=!4m2!3m1!1s0x350ce4a9d5e14011:0x2025d5df2e52287f", "lat": 33.5170648, "lng": 126.5221484},
-{"id": 22, "name": "熟成到 涯月店", "name_kr": "숙성도 애월점", "cat": "food", "area": "涯月", "desc": "熟成黑豬肉名店的涯月分店。", "note": "", "gmaps": "https://www.google.com/maps/place/%E7%86%9F%E6%88%90%E5%88%B0+%E6%B6%AF%E6%9C%88%E5%BA%97/data=!4m2!3m1!1s0x350cf5376a720e8b:0xb3812aa6ac650454", "lat": 33.463515, "lng": 126.3096504},
-{"id": 23, "name": "Floyeast Bakery Cafe", "name_kr": "플로이스트 베이커리 카페", "cat": "cafe", "area": "城山·古城里", "desc": "城山的烘焙咖啡館。", "note": "", "gmaps": "https://www.google.com/maps/place/Floyeast+Bakery+Cafe/data=!4m2!3m1!1s0x350d130006ad457f:0x6e905e0a24cbac63", "lat": 33.4291562, "lng": 126.9338099},
-{"id": 24, "name": "Cafe Out Of Ordinary", "name_kr": "카페 아오오", "cat": "cafe", "area": "城山·環海長城路", "desc": "面海的景觀咖啡廳。", "note": "", "gmaps": "https://www.google.com/maps/place/Cafe+Out+Of+Ordinary/data=!4m2!3m1!1s0x350d13973971b137:0xb443b7e31a57491b", "lat": 33.3791372, "lng": 126.8799189},
-{"id": 25, "name": "고결 고등어숯불반상", "name_kr": "고결 고등어숯불반상", "cat": "food", "area": "大靜·兄弟海岸", "desc": "炭烤鯖魚定食，二樓看得到兄弟島。", "note": "", "gmaps": "https://www.google.com/maps/place/%EA%B3%A0%EA%B2%B0+%EA%B3%A0%EB%93%B1%EC%96%B4%EC%88%AF%EB%B6%88%EB%B0%98%EC%83%81/data=!4m2!3m1!1s0x350c439205c7a713:0x98a415c26a3cb0ac", "lat": 33.2068097, "lng": 126.2899923},
-{"id": 26, "name": "老奶奶的年糕", "name_kr": "할머니떡집", "cat": "cafe", "area": "西歸浦·西歸洞", "desc": "老字號年糕店。", "note": "", "gmaps": "https://www.google.com/maps/place/%E8%80%81%E5%A5%B6%E5%A5%B6%E7%9A%84%E5%B9%B4%E7%B3%95/data=!4m2!3m1!1s0x350c539dc531ebef:0xb9d609457f494057", "lat": 33.2486024, "lng": 126.5642223},
-{"id": 27, "name": "麵條海洋 本店", "name_kr": "국수바다 본점", "cat": "food", "area": "西歸浦·一周西路", "desc": "豬肉湯麵老店。", "note": "", "gmaps": "https://www.google.com/maps/place/%E9%BA%B5%E6%A2%9D%E6%B5%B7%E6%B4%8B+%E6%9C%AC%E5%BA%97/data=!4m2!3m1!1s0x350c5a97de6bc439:0xd72da3c9bd9b38fa", "lat": 33.253023, "lng": 126.447197},
-{"id": 28, "name": "Miyoung's Sashimi", "name_kr": "미영이네", "cat": "food", "area": "大靜·摹瑟浦", "desc": "生魚片與水拌生魚片名店。", "note": "", "gmaps": "https://www.google.com/maps/place/Miyoung's+Sashimi/data=!4m2!3m1!1s0x350c69f72c653503:0x735a1423dfdddac2", "lat": 33.2177388, "lng": 126.2498932},
-{"id": 29, "name": "兄弟島海螺刀切麵", "name_kr": "형제섬보말칼국수", "cat": "food", "area": "大靜·兄弟海岸", "desc": "面對兄弟島的海螺刀削麵店。", "note": "", "gmaps": "https://www.google.com/maps/place/%E5%85%84%E5%BC%9F%E5%B3%B6%E6%B5%B7%E8%9E%BA%E5%88%80%E5%88%87%E9%BA%B5/data=!4m2!3m1!1s0x350c423bba5f6739:0x59e837b9cca35040", "lat": 33.2069012, "lng": 126.2902768},
-{"id": 30, "name": "Tongbal", "name_kr": "통발", "cat": "food", "area": "城山·日出路", "desc": "城山的居酒屋。", "note": "", "gmaps": "https://www.google.com/maps/place/Tongbal/data=!4m2!3m1!1s0x350d152b174b98b9:0xed1678ef1c86571c", "lat": 33.4609516, "lng": 126.9341431},
-{"id": 31, "name": "도토리 제주점", "name_kr": "도토리 제주점", "cat": "cafe", "area": "涯月", "desc": "涯月的人氣麵包店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EB%8F%84%ED%86%A0%EB%A6%AC+%EC%A0%9C%EC%A3%BC%EC%A0%90/data=!4m2!3m1!1s0x350cf50047202a4f:0xeae3b0fa977a0b45", "lat": 33.4632162, "lng": 126.3097137},
-{"id": 32, "name": "Sogeumbachi Sooninae", "name_kr": "소금바치 순이네", "cat": "food", "area": "舊左·終達里", "desc": "海女風海鮮家常菜。", "note": "", "gmaps": "https://www.google.com/maps/place/Sogeumbachi+Sooninae/data=!4m2!3m1!1s0x350d150846ae2559:0xd6c53d0e7b976bfd", "lat": 33.5035471, "lng": 126.9127463},
-{"id": 33, "name": "月高家 黑豬肉", "name_kr": "월고집 월정리고기집", "cat": "food", "area": "舊左·月汀里", "desc": "月汀里的黑豬肉燒烤店。", "note": "", "gmaps": "https://www.google.com/maps/place/%E6%9C%88%E9%AB%98%E5%AE%B6+%E9%BB%91%E8%B1%AC%E8%82%89/data=!4m2!3m1!1s0x350d172adde62f3d:0x60b565d5001399c4", "lat": 33.5533544, "lng": 126.7911073},
-{"id": 34, "name": "바담깨비애월회관", "name_kr": "바담깨비애월회관", "cat": "food", "area": "涯月·海岸路", "desc": "涯月海岸路上的海鮮餐廳。", "note": "", "gmaps": "https://www.google.com/maps/place/%EB%B0%94%EB%8B%B4%EA%B9%A8%EB%B9%84%EC%95%A0%EC%9B%94%ED%9A%8C%EA%B4%80/data=!4m2!3m1!1s0x350cf1de0822f097:0x421b901eb106f12b", "lat": 33.4838162, "lng": 126.3956061},
-{"id": 35, "name": "Blanc Rocher", "name_kr": "블랑로쉐", "cat": "cafe", "area": "牛島", "desc": "牛島上的咖啡廳。", "note": "", "gmaps": "https://www.google.com/maps/place/Blanc+Rocher/data=!4m2!3m1!1s0x350d4001de8a55a5:0x4407664131cf52d7", "lat": 33.5156863, "lng": 126.9580858},
-{"id": 36, "name": "Modern Dombe", "name_kr": "모던돔베 공항본점", "cat": "food", "area": "濟州市·機場旁", "desc": "돔베고기與麵食，離機場近。", "note": "", "gmaps": "https://www.google.com/maps/place/Modern+Dombe/data=!4m2!3m1!1s0x350cfbe9b32dd343:0x15786c0e93a18cda", "lat": 33.4570687, "lng": 126.4860197},
-{"id": 37, "name": "Coffee Temple Jeju", "name_kr": "커피템플", "cat": "cafe", "area": "濟州市·永坪", "desc": "濟州知名的精品咖啡烘豆店。", "note": "", "gmaps": "https://www.google.com/maps/place/Coffee+Temple+Jeju/data=!4m2!3m1!1s0x350cfd213f739b25:0xc42ea610142d6a43", "lat": 33.4781416, "lng": 126.5702901},
-{"id": 38, "name": "Cafe Gyulkkot Darak", "name_kr": "귤꽃다락", "cat": "cafe", "area": "西歸浦·Ieodo路", "desc": "橘子園裡的咖啡廳。", "note": "", "gmaps": "https://www.google.com/maps/place/Cafe+Gyulkkot+Darak/data=!4m2!3m1!1s0x357b5b5937c887d1:0x49c86381b28349ab", "lat": 33.2464249, "lng": 126.5225977},
-{"id": 39, "name": "Your Rice Cake", "name_kr": "유라케", "cat": "cafe", "area": "濟州市·龍海路", "desc": "手作年糕甜點店。", "note": "", "gmaps": "https://www.google.com/maps/place/Your+Rice+Cake/data=!4m2!3m1!1s0x350cfb414d7ed325:0x958c808949701aeb", "lat": 33.5073504, "lng": 126.504776},
-{"id": 40, "name": "태광식당", "name_kr": "태광식당", "cat": "food", "area": "濟州市·塔洞", "desc": "塔洞路上的老式食堂。", "note": "", "gmaps": "https://www.google.com/maps/place/%ED%83%9C%EA%B4%91%EC%8B%9D%EB%8B%B9/data=!4m2!3m1!1s0x350ce4ab6b263a73:0x4971547aec5bc188", "lat": 33.5126649, "lng": 126.5186913},
-{"id": 41, "name": "London Bagel Museum Jeju", "name_kr": "런던베이글뮤지엄 제주점", "cat": "cafe", "area": "舊左·東福里", "desc": "人氣貝果店的濟州分店，常需排隊。", "note": "", "gmaps": "https://www.google.com/maps/place/London+Bagel+Museum+Jeju/data=!4m2!3m1!1s0x350d1970b7a01c3b:0x9522d57871ef1c43", "lat": 33.5535978, "lng": 126.7155939},
-{"id": 42, "name": "濟州韓麵家", "name_kr": "제주한면가", "cat": "food", "area": "朝天·北宣路", "desc": "韓式麵食，豆豆飯飯值得點。", "note": "豆豆飯飯推薦", "gmaps": "https://www.google.com/maps/place/%E6%BF%9F%E5%B7%9E%E9%9F%93%E9%BA%B5%E5%AE%B6/data=!4m2!3m1!1s0x350d1bf419149e6b:0x92e96aec5a2fb688", "lat": 33.5120324, "lng": 126.7000256},
-{"id": 43, "name": "Kkotdwaeji Grill", "name_kr": "꽃돼지 연탄 구이", "cat": "food", "area": "西歸浦·大浦洞", "desc": "煤炭火烤豬肉。", "note": "", "gmaps": "https://www.google.com/maps/place/Kkotdwaeji+Grill/data=!4m2!3m1!1s0x350c500c50bbecd1:0x583650d5775fd1c2", "lat": 33.242032, "lng": 126.4439877},
-{"id": 44, "name": "so much more", "name_kr": "so much more", "cat": "cafe", "area": "朝天·北村", "desc": "北村的咖啡廳。", "note": "", "gmaps": "https://www.google.com/maps/place/so+much+more/data=!4m2!3m1!1s0x350d1f004af53b87:0x7a76b48c79db3b31", "lat": 33.5503288, "lng": 126.6948041},
-{"id": 45, "name": "Udo Sand", "name_kr": "우도샌드", "cat": "cafe", "area": "牛島", "desc": "牛島的甜點店。", "note": "", "gmaps": "https://www.google.com/maps/place/Udo+Sand/data=!4m2!3m1!1s0x350d410b354c9e39:0x55cc314b08679240", "lat": 33.5162432, "lng": 126.9576266},
-{"id": 46, "name": "Oleun", "name_kr": "오른", "cat": "cafe", "area": "城山·迎日海岸路", "desc": "海邊的景觀咖啡廳。", "note": "", "gmaps": "https://www.google.com/maps/place/Oleun/data=!4m2!3m1!1s0x350d150051d5a409:0xc19375fa183ba71b", "lat": 33.4741667, "lng": 126.9111111},
-{"id": 47, "name": "엉클프레즐하우스", "name_kr": "엉클프레즐하우스", "cat": "cafe", "area": "朝天·咸德", "desc": "手作扭結餅專賣店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EC%97%89%ED%81%B4%ED%94%84%EB%A0%88%EC%A6%90%ED%95%98%EC%9A%B0%EC%8A%A4/data=!4m2!3m1!1s0x350d1f9d1c09edb1:0xb6d6db4faae22596", "lat": 33.5413678, "lng": 126.6742925},
-{"id": 48, "name": "駱駝咖啡 濟州店", "name_kr": "카멜커피 제주점", "cat": "cafe", "area": "舊左·杏源", "desc": "人氣카멜커피的濟州海景店。", "note": "", "gmaps": "https://www.google.com/maps/place/%E9%A7%B1%E9%A7%9D%E5%92%96%E5%95%A1+%E6%BF%9F%E5%B7%9E%E5%BA%97/data=!4m2!3m1!1s0x350d17001bae2799:0xcc709688d6b7c59b", "lat": 33.5568768, "lng": 126.8098896},
-{"id": 49, "name": "Daily Stitch", "name_kr": "dailystitch", "cat": "shop", "area": "朝天·咸德", "desc": "咸德的刺繡雜貨小店。", "note": "", "gmaps": "https://www.google.com/maps/place/Daily+Stitch/data=!4m2!3m1!1s0x350ce2e67191f38b:0x61a1dca91586c753", "lat": 33.5419995, "lng": 126.6640605},
-{"id": 50, "name": "沙溪海岸", "name_kr": "사계해안", "cat": "spot", "area": "安德·沙溪", "desc": "可遠望兄弟島與山房山的黑沙海岸。", "note": "", "gmaps": "https://www.google.com/maps/place/%E6%B2%99%E6%BA%AA%E6%B5%B7%E5%B2%B8/data=!4m2!3m1!1s0x350c43dfaeea13c3:0x2546acd773084eed", "lat": 33.2231459, "lng": 126.297477},
-{"id": 51, "name": "Ttarabi Oreum", "name_kr": "따라비오름", "cat": "spot", "area": "表善·加時里", "desc": "有「오름女王」之稱的火山丘，來回步行約一小時。", "note": "步行總路程1小時內", "gmaps": "https://www.google.com/maps/place/Ttarabi+Oreum/data=!4m2!3m1!1s0x350d05a4217b2df3:0x473a94e5433f79b5", "lat": 33.3870582, "lng": 126.7534582},
-{"id": 52, "name": "D&DEPARTMENT JEJU by ARARIO", "name_kr": "디앤디파트먼트 제주 바이 아라리오", "cat": "shop", "area": "濟州市·塔洞", "desc": "主打濟州在地設計的生活選物店。", "note": "", "gmaps": "https://www.google.com/maps/place/D%26DEPARTMENT+JEJU+by+ARARIO/data=!4m2!3m1!1s0x350ce399db600891:0x26e2db239c7f35c2", "lat": 33.5176855, "lng": 126.5234639},
-{"id": 53, "name": "挾才海水浴場", "name_kr": "협재해수욕장", "cat": "spot", "area": "翰林·挾才", "desc": "看得到飛揚島的翡翠色沙灘。", "note": "", "gmaps": "https://www.google.com/maps/place/%E6%8C%BE%E6%89%8D%E6%B5%B7%E6%B0%B4%E6%B5%B4%E5%A0%B4/data=!4m2!3m1!1s0x350c6100c373b0f1:0x6ce2ce2c47a28400", "lat": 33.3942945, "lng": 126.2398813},
-{"id": 54, "name": "1100高地 休憩所", "name_kr": "1100고지 휴게소", "cat": "spot", "area": "西歸浦·穡達洞", "desc": "1100 公路最高點的休息站與濕地，秋天賞楓。", "note": "楓葉🍁", "gmaps": "https://www.google.com/maps/place/1100%E9%AB%98%E5%9C%B0+%E4%BC%91%E6%86%A9%E6%89%80/data=!4m2!3m1!1s0x350c57c0decbb733:0xd9bf1dcb826c5b1a", "lat": 33.3577959, "lng": 126.4624949},
-{"id": 55, "name": "고내리 바닷길 포토스팟", "name_kr": "고내리 바닷길 포토스팟", "cat": "spot", "area": "涯月·高內里", "desc": "高內里海邊小路的熱門拍照點。", "note": "", "gmaps": "https://www.google.com/maps/place/%EA%B3%A0%EB%82%B4%EB%A6%AC+%EB%B0%94%EB%8B%B7%EA%B8%B8+%ED%8F%AC%ED%86%A0%EC%8A%A4%ED%8C%9F/data=!4m2!3m1!1s0x350cf50032a45cdf:0x5dca902b7ffde8ef", "lat": 33.4666262, "lng": 126.3346484},
-{"id": 56, "name": "Leude", "name_kr": "르데", "cat": "shop", "area": "安德·沙溪", "desc": "沙溪的選物與禮品店。", "note": "", "gmaps": "https://www.google.com/maps/place/Leude/data=!4m2!3m1!1s0x350c430014d195f3:0x37e88db1ffd1a678", "lat": 33.2489465, "lng": 126.3220571},
-{"id": 57, "name": "Artbox Jeju Yeondong", "name_kr": "아트박스 제주연동점", "cat": "shop", "area": "濟州市·蓮洞", "desc": "韓國連鎖文具雜貨店。", "note": "", "gmaps": "https://www.google.com/maps/place/Artbox+Jeju+Yeondong/data=!4m2!3m1!1s0x350cfb6ebcdb0409:0x5acd06b226d785fb", "lat": 33.4877006, "lng": 126.4910151},
-{"id": 58, "name": "新川牧場", "name_kr": "신천목장", "cat": "spot", "area": "城山·新豐里", "desc": "海邊的廣闊牧草地，冬天會鋪滿橘皮。", "note": "", "gmaps": "https://www.google.com/maps/place/%E6%96%B0%E5%B7%9D%E7%89%A7%E5%A0%B4/data=!4m2!3m1!1s0x350d0e8e7c78eea1:0xc6f96777dfd33086", "lat": 33.3567015, "lng": 126.8682182},
-{"id": 59, "name": "Bigpokes", "name_kr": "빅포켓", "cat": "shop", "area": "濟州市·觀德路", "desc": "市區的雜貨禮品店。", "note": "", "gmaps": "https://www.google.com/maps/place/Bigpokes/data=!4m2!3m1!1s0x350ce589ed15ff97:0xb3f8a7f607405cb8", "lat": 33.5129348, "lng": 126.5214933},
-{"id": 60, "name": "Hamdeok Beach", "name_kr": "함덕해수욕장", "cat": "spot", "area": "朝天·咸德", "desc": "濟州最有名的碧綠色海水浴場。", "note": "", "gmaps": "https://www.google.com/maps/place/Hamdeok+Beach/data=!4m2!3m1!1s0x350cfcafaaf72b55:0xf0d2596ca578b870", "lat": 33.5434231, "lng": 126.6697752},
-{"id": 61, "name": "Heisan Jeju Flagship Store", "name_kr": "헤이산 제주", "cat": "shop", "area": "涯月", "desc": "服飾品牌的涯月旗艦店。", "note": "", "gmaps": "https://www.google.com/maps/place/Heisan+Jeju+Flagship+Store/data=!4m2!3m1!1s0x350cf5440de1b0bf:0x68e1c1531b138e33", "lat": 33.463027, "lng": 126.3097897},
-{"id": 62, "name": "수풀 제주 스토어", "name_kr": "수풀 제주 스토어", "cat": "shop", "area": "翰林·翰水浦路", "desc": "設計家飾選物店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EC%88%98%ED%92%80+%EC%A0%9C%EC%A3%BC+%EC%8A%A4%ED%86%A0%EC%96%B4/data=!4m2!3m1!1s0x350c5f9dadce38e9:0xeba87f2d520f9225", "lat": 33.4179013, "lng": 126.2666193},
-{"id": 63, "name": "Lu-Inhom", "name_kr": "루인홈", "cat": "shop", "area": "朝天·中山間東路", "desc": "禮品雜貨店。", "note": "", "gmaps": "https://www.google.com/maps/place/Lu-Inhom/data=!4m2!3m1!1s0x350d1d4bb667516d:0xc71079bddf7f61c6", "lat": 33.5029546, "lng": 126.6942576},
-{"id": 64, "name": "Mulyohi", "name_kr": "무료히", "cat": "shop", "area": "濟州市·三徒二洞", "desc": "市區巷內的雜貨小舖。", "note": "", "gmaps": "https://www.google.com/maps/place/Mulyohi/data=!4m2!3m1!1s0x350ce3003be93445:0xd7f0ce24ff7373cb", "lat": 33.5100889, "lng": 126.5235413},
-{"id": 65, "name": "hetras Jeju", "name_kr": "헤트라스 제주", "cat": "shop", "area": "濟州市·新光路", "desc": "美妝保養品店。", "note": "", "gmaps": "https://www.google.com/maps/place/hetras+Jeju/data=!4m2!3m1!1s0x350cfb3099c6ddc1:0xa1f4452f935524b0", "lat": 33.4901546, "lng": 126.4899427},
-{"id": 66, "name": "8 Gwandeok-ro 選物店", "name_kr": "관덕로 8", "cat": "shop", "area": "濟州市·觀德路", "desc": "觀德路 8 號的選物店。", "note": "選物店", "gmaps": "https://www.google.com/maps/place/8+Gwandeok-ro/data=!4m2!3m1!1s0x350ce4aafd8173ad:0x3203785115d0afcb", "lat": 33.5127489, "lng": 126.5202265},
-{"id": 67, "name": "MyLittleJinji", "name_kr": "마이리틀진지", "cat": "shop", "area": "濟州市·道頭洞", "desc": "飾品與時尚小店。", "note": "", "gmaps": "https://www.google.com/maps/place/MyLittleJinji+%EB%A7%88%EC%9D%B4%EB%A6%AC%ED%8B%80%EC%A7%84%EC%A7%80/data=!4m2!3m1!1s0x350cfb214507905f:0x8ebfce50ae5d1317", "lat": 33.5029707, "lng": 126.463959},
-{"id": 68, "name": "엠와이제주", "name_kr": "엠와이제주", "cat": "shop", "area": "濟州市·三無路", "desc": "禮品雜貨店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EC%97%A0%EC%99%80%EC%9D%B4%EC%A0%9C%EC%A3%BC/data=!4m2!3m1!1s0x350cfb003cd30045:0xa0537b2852d3c049", "lat": 33.4901323, "lng": 126.4905208},
-{"id": 69, "name": "Assisi 濟州香水", "name_kr": "애월 아시시", "cat": "shop", "area": "涯月·海岸路", "desc": "香氛品牌店，可做濟州主題香水。", "note": "濟州香水", "gmaps": "https://www.google.com/maps/place/Assisi/data=!4m2!3m1!1s0x350cf7c18e7666c3:0x715e67b4e43f267f", "lat": 33.4778079, "lng": 126.3550408},
-{"id": 70, "name": "탱글 (소품샵)", "name_kr": "탱글", "cat": "shop", "area": "涯月", "desc": "小物雜貨店。", "note": "", "gmaps": "https://www.google.com/maps/place/%ED%83%B1%EA%B8%80(%EC%86%8C%ED%92%88%EC%83%B5)/data=!4m2!3m1!1s0x350cf50043825c7b:0xb170e3182091e792", "lat": 33.4656631, "lng": 126.3200485},
-{"id": 71, "name": "던스트 제주 플래그십 스토어", "name_kr": "던스트 제주 플래그십 스토어", "cat": "shop", "area": "涯月", "desc": "韓國服飾品牌 DUNST 的濟州旗艦店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EB%8D%98%EC%8A%A4%ED%8A%B8+%EC%A0%9C%EC%A3%BC+%ED%94%8C%EB%9E%98%EA%B7%B8%EC%8B%AD+%EC%8A%A4%ED%86%A0%EC%96%B4/data=!4m2!3m1!1s0x350cf50d2c2c2529:0x7a8beb91646ca44a", "lat": 33.4625151, "lng": 126.3094702},
-{"id": 72, "name": "메르시제주 MERCI JEJU", "name_kr": "메르시제주", "cat": "shop", "area": "濟州市·龍頭岩路", "desc": "濟州伴手禮專賣店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EB%A9%94%EB%A5%B4%EC%8B%9C%EC%A0%9C%EC%A3%BC+%7C+%E6%BF%9F%E5%B7%9E%E5%B3%B6%E7%B4%80%E5%BF%B5%E5%93%81+%7C+%E6%BF%9F%E5%B7%9E%E5%B3%B6%E4%BC%B4%E6%89%8B%E7%A6%AE+%7C+MERCI+JEJU+SOUVENIR+SHOP+%7C/data=!4m2!3m1!1s0x350ce522dc44004d:0x2438ef51fd9e076d", "lat": 33.5145824, "lng": 126.5129743},
-{"id": 73, "name": "甫木浦口階段", "name_kr": "보목포구계단", "cat": "spot", "area": "西歸浦·甫木", "desc": "海中階梯，退潮前後一小時才會露出。", "note": "要降朝前後一小時", "gmaps": "https://www.google.com/maps/place/%E7%94%AB%E6%9C%A8%E6%B5%A6%E5%8F%A3%E9%9A%8E%E6%AE%B5/data=!4m2!3m1!1s0x350c53005e934907:0xd24ce28e73edcfd0", "lat": 33.2395268, "lng": 126.6073589},
-{"id": 74, "name": "세기알해변", "name_kr": "세기알해변", "cat": "spot", "area": "舊左·金寧", "desc": "金寧一帶的小海灣，浮潛與潛水點。", "note": "", "gmaps": "https://www.google.com/maps/place/%EC%84%B8%EA%B8%B0%EC%95%8C%ED%95%B4%EB%B3%80/data=!4m2!3m1!1s0x350d19184f7d0061:0xfe15ecc10c2c6277", "lat": 33.558169, "lng": 126.7553943},
-{"id": 75, "name": "모아이 MOI", "name_kr": "모아이 MOI", "cat": "shop", "area": "濟州市·東門路", "desc": "禮品選物店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EB%AA%A8%EC%95%84%EC%9D%B4+MOI/data=!4m2!3m1!1s0x350ce337975caadf:0x8f28911a5c85cb09", "lat": 33.5129041, "lng": 126.5344251},
-{"id": 76, "name": "城山日出峰", "name_kr": "성산일출봉", "cat": "spot", "area": "城山", "desc": "UNESCO 世界自然遺產的火山口，看日出的名所。", "note": "", "gmaps": "https://www.google.com/maps/place/%E5%9F%8E%E5%B1%B1%E6%97%A5%E5%87%BA%E5%B3%B0/data=!4m2!3m1!1s0x350d14b9f6e3789f:0x555132053a23b64b", "lat": 33.458056, "lng": 126.9425},
-{"id": 77, "name": "龍頭海岸", "name_kr": "용머리해안", "cat": "spot", "area": "安德·沙溪", "desc": "山房山下的層積岩海岸，會依潮位與天氣封閉。", "note": "", "gmaps": "https://www.google.com/maps/place/%E9%BE%8D%E9%A0%AD%E6%B5%B7%E5%B2%B8/data=!4m2!3m1!1s0x350c4307a770e15b:0x5f8461d229ddab28", "lat": 33.2316155, "lng": 126.3148321},
-{"id": 78, "name": "O'sulloc Tea Museum", "name_kr": "오설록 티 뮤지엄", "cat": "spot", "area": "安德·神話歷史路", "desc": "綠茶園裡的 O'sulloc 茶博物館。", "note": "", "gmaps": "https://www.google.com/maps/place/%E3%82%AA%E3%82%BD%E3%83%AB%E3%83%AD%E3%83%83%E3%82%AF%E3%83%BB%E3%83%86%E3%82%A3%E3%83%BC%E3%83%BB%E3%83%9F%E3%83%A5%E3%83%BC%E3%82%B8%E3%82%A2%E3%83%A0/data=!4m2!3m1!1s0x350c5d1219ebcc11:0xb8a71289da43cad1", "lat": 33.3059385, "lng": 126.2894355},
-{"id": 79, "name": "김녕해수욕장", "name_kr": "김녕해수욕장", "cat": "spot", "area": "舊左·金寧", "desc": "水色清透的金寧海水浴場。", "note": "", "gmaps": "https://www.google.com/maps/place/%EA%B9%80%EB%85%95%ED%95%B4%EC%88%98%EC%9A%95%EC%9E%A5/data=!4m2!3m1!1s0x350d184767ce97e3:0x63f0205bf57e068f", "lat": 33.5582774, "lng": 126.759787},
-{"id": 80, "name": "aeae 제주점", "name_kr": "aeae 제주점", "cat": "shop", "area": "濟州市·觀德路", "desc": "女裝選物店。", "note": "", "gmaps": "https://www.google.com/maps/place/aeae+%EC%A0%9C%EC%A3%BC%EC%A0%90/data=!4m2!3m1!1s0x350ce3859622bef1:0xb56c08d61da85054", "lat": 33.5146606, "lng": 126.5264318},
-{"id": 81, "name": "섬조각 somejogak", "name_kr": "섬조각", "cat": "shop", "area": "濟州市·中央路", "desc": "濟州風紀念品小店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EC%84%AC%EC%A1%B0%EA%B0%81+somejogak/data=!4m2!3m1!1s0x350ce339102c9b77:0xb3b53dae96e23a4a", "lat": 33.5148942, "lng": 126.5273838},
-{"id": 82, "name": "오브젝트 제주점 Object Jeju", "name_kr": "오브젝트 제주점", "cat": "shop", "area": "舊左·東福里", "desc": "韓國文創雜貨 Object 的濟州店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EC%98%A4%EB%B8%8C%EC%A0%9D%ED%8A%B8+%EC%A0%9C%EC%A3%BC%EC%A0%90+Object+Jeju+Branch/data=!4m2!3m1!1s0x350d19001294129d:0xb018f43394d06bd5", "lat": 33.5533877, "lng": 126.7156758},
-{"id": 83, "name": "金寧海邊 海岸路", "name_kr": "김녕해변 바닷길", "cat": "spot", "area": "舊左·金寧", "desc": "金寧海邊的海岸散步路。", "note": "", "gmaps": "https://www.google.com/maps/place/%E9%87%91%E5%AF%A7%E6%B5%B7%E9%82%8A+%E6%B5%B7%E5%B2%B8%E8%B7%AF/data=!4m2!3m1!1s0x350d19216549061f:0x38836d0a5826c23", "lat": 33.5578652, "lng": 126.7488633},
-{"id": 84, "name": "濟州大學路 102 銀杏", "name_kr": "제주대학로 102", "cat": "spot", "area": "濟州市·我羅洞", "desc": "濟州大學路上的銀杏行道樹路段。", "note": "銀杏", "gmaps": "https://www.google.com/maps/place/102+Jejudaehak-ro/data=!4m2!3m1!1s0x350cfc5432e1687b:0x42f0fde11e1da7b", "lat": 33.4547583, "lng": 126.5622562},
-{"id": 85, "name": "제주대학교 은행나무길", "name_kr": "제주대학교 은행나무길", "cat": "spot", "area": "濟州市·我羅洞", "desc": "濟州大學校內的銀杏大道。", "note": "銀杏", "gmaps": "https://www.google.com/maps/place/%EC%A0%9C%EC%A3%BC%EB%8C%80%ED%95%99%EA%B5%90+%EC%9D%80%ED%96%89%EB%82%98%EB%AC%B4%EA%B8%B8/data=!4m2!3m1!1s0x350cfd5dfc7992b9:0xa744dce455d2ee54", "lat": 33.4585903, "lng": 126.5572137},
-{"id": 86, "name": "御里牧溪谷", "name_kr": "어리목계곡", "cat": "spot", "area": "漢拏山·御里牧", "desc": "漢拏山御里牧入口的溪谷，秋天賞楓。", "note": "🍁", "gmaps": "https://www.google.com/maps/place/%E5%BE%A1%E9%87%8C%E7%89%A7%E6%BA%AA%E8%B0%B7/data=!4m2!3m1!1s0x350cf8ee90ade509:0xd83c592c4cad812e", "lat": 33.3891192, "lng": 126.4942262},
-{"id": 87, "name": "山麓北路 429 賞楓", "name_kr": "산록북로 429", "cat": "spot", "area": "濟州市·山麓北路", "desc": "山麓北路一帶的賞楓路段。", "note": "楓葉🍁", "gmaps": "https://www.google.com/maps/place/429+Sallokbuk-ro/data=!4m2!3m1!1s0x350cfea864349281:0x677c5c880e685811", "lat": 33.4246038, "lng": 126.5270026},
-{"id": 88, "name": "大韓佛敎曹溪宗 天王寺", "name_kr": "대한불교조계종 천왕사", "cat": "spot", "area": "漢拏山·1100路", "desc": "漢拏山山腰的寺廟，秋天楓紅。", "note": "", "gmaps": "https://www.google.com/maps/place/%E5%A4%A7%E9%9F%93%E4%BD%9B%E6%95%8E%E6%9B%B9%E6%BA%AA%E5%AE%97+%E5%A4%A9%E7%8E%8B%E5%AF%BA/data=!4m2!3m1!1s0x350cf922278eb235:0xc701fd212b850243", "lat": 33.4087029, "lng": 126.4944197},
-{"id": 89, "name": "天娥溪谷", "name_kr": "천아계곡", "cat": "spot", "area": "涯月·光令里", "desc": "濟州最有名的賞楓溪谷。", "note": "", "gmaps": "https://www.google.com/maps/place/%E5%A4%A9%E5%A8%A5%E6%BA%AA%E8%B0%B7/data=!4m2!3m1!1s0x350cf9be320a1211:0x70fdb9131ea4a762", "lat": 33.3971528, "lng": 126.459872},
-{"id": 90, "name": "제주사슴책방", "name_kr": "제주사슴책방", "cat": "shop", "area": "朝天·大屹里", "desc": "森林裡的獨立書店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EC%A0%9C%EC%A3%BC%EC%82%AC%EC%8A%B4%EC%B1%85%EB%B0%A9/data=!4m2!3m1!1s0x350d1d7b1517fff1:0x460f835014545bcc", "lat": 33.4958502, "lng": 126.6588722},
-{"id": 91, "name": "took", "name_kr": "took", "cat": "shop", "area": "濟州市·中央路", "desc": "巷內的禮品小店。", "note": "", "gmaps": "https://www.google.com/maps/place/took/data=!4m2!3m1!1s0x350ce50cedd1a483:0xab629b361bc04c6e", "lat": 33.5109247, "lng": 126.5213179},
-{"id": 92, "name": "웨이브먼트 소품샵", "name_kr": "웨이브먼트", "cat": "shop", "area": "濟州市·西海岸路", "desc": "海邊的小物雜貨店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EC%9B%A8%EC%9D%B4%EB%B8%8C%EB%A8%BC%ED%8A%B8+%EC%86%8C%ED%92%88%EC%83%B5/data=!4m2!3m1!1s0x350cfb004660cbaf:0x760033381355f996", "lat": 33.5029732, "lng": 126.4639915},
-{"id": 93, "name": "슬로모 slo-mo", "name_kr": "슬로모", "cat": "shop", "area": "濟州市·山地路", "desc": "市區的選物店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EC%8A%AC%EB%A1%9C%EB%AA%A8+slo-mo/data=!4m2!3m1!1s0x350ce3001122f573:0x9e1804ccb5b05fed", "lat": 33.5134763, "lng": 126.52814},
-{"id": 94, "name": "Gyulmedal", "name_kr": "귤메달", "cat": "cafe", "area": "濟州市·塔洞", "desc": "橘子主題的甜點咖啡店。", "note": "", "gmaps": "https://www.google.com/maps/place/Gyulmedal/data=!4m2!3m1!1s0x350ce5a1374f337d:0x5225c899a5f4fedd", "lat": 33.5171238, "lng": 126.5229357},
-{"id": 95, "name": "gyulgyulstore", "name_kr": "귤귤스토어 도두점", "cat": "shop", "area": "濟州市·道頭", "desc": "橘子主題的紀念品店。", "note": "", "gmaps": "https://www.google.com/maps/place/gyulgyulstore/data=!4m2!3m1!1s0x350cfb3621d32435:0xaf36e459a833212", "lat": 33.5087904, "lng": 126.471508},
-{"id": 96, "name": "무드제주 MOOD JEJU", "name_kr": "무드제주", "cat": "shop", "area": "濟州市·南城路", "desc": "香氛與生活選物店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EB%AC%B4%EB%93%9C%EC%A0%9C%EC%A3%BC+(MOOD+JEJU)/data=!4m2!3m1!1s0x350cfbcfe39cd663:0x438acc703aeba771", "lat": 33.5077651, "lng": 126.5152691},
-{"id": 97, "name": "杏源海灘 (柯南海灘)", "name_kr": "행원해변(코난해변)", "cat": "spot", "area": "舊左·杏源", "desc": "因柯南場景走紅的行院海邊。", "note": "", "gmaps": "https://www.google.com/maps/place/%E6%9D%8F%E6%BA%90%E6%B5%B7%E7%81%98+(%E6%9F%AF%E5%8D%97%E6%B5%B7%E7%81%98)/data=!4m2!3m1!1s0x350d179c3747e191:0x7a3b288b0d2e0911", "lat": 33.5575318, "lng": 126.8112241},
-{"id": 98, "name": "萬丈窟", "name_kr": "만장굴", "cat": "spot", "area": "舊左·萬丈窟", "desc": "世界最長的熔岩洞窟之一，UNESCO 世界自然遺產。", "note": "", "gmaps": "https://www.google.com/maps/place/%E8%90%AC%E4%B8%88%E7%AA%9F/data=!4m2!3m1!1s0x350d19c496216a99:0xbb66abf00c2b95a6", "lat": 33.5281972, "lng": 126.7717618},
-{"id": 99, "name": "소심한책방", "name_kr": "소심한책방", "cat": "shop", "area": "舊左·終達里", "desc": "終達里的人氣獨立書店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EC%86%8C%EC%8B%AC%ED%95%9C%EC%B1%85%EB%B0%A9/data=!4m2!3m1!1s0x350d1453d29e1905:0x70ffbddfdf31e4d1", "lat": 33.4905308, "lng": 126.9028043},
-{"id": 100, "name": "달리센트", "name_kr": "달리센트", "cat": "shop", "area": "舊左·終達里", "desc": "香氛生活小店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EB%8B%AC%EB%A6%AC%EC%84%BC%ED%8A%B8/data=!4m2!3m1!1s0x350d15e3548dc69b:0x178606cce6d5296", "lat": 33.4903833, "lng": 126.8986919},
-{"id": 101, "name": "근자c가게", "name_kr": "근자c가게", "cat": "shop", "area": "舊左·終達里", "desc": "終達里的雜貨小店。", "note": "", "gmaps": "https://www.google.com/maps/place/%EA%B7%BC%EC%9E%90c%EA%B0%80%EA%B2%8C/data=!4m2!3m1!1s0x350d1452b1503ef5:0xdeb8f74501bfee7a", "lat": 33.4959526, "lng": 126.9013236}
+{"id": 1, "category": "景點", "region": "東部", "name": "Uae", "name_kr": "Uae", "lat": null, "lng": null, "description": "朝天一帶的小店", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/Uae/data=!4m2!3m1!1s0x350d1dba593d7271:0xff1bbaef48140697"},
+{"id": 2, "category": "景點", "region": "漢拏山", "name": "耽羅敎育院", "name_kr": "탐라교육원", "lat": null, "lng": null, "description": "扁柏林步道，秋天賞楓", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%E8%80%BD%E7%BE%85%E6%95%8E%E8%82%B2%E9%99%A2/data=!4m2!3m1!1s0x350cfea95397ce03:0x1a02b4e239e615d6"},
+{"id": 3, "category": "景點", "region": "漢拏山", "name": "漢拏 生態林", "name_kr": "한라생태숲", "lat": null, "lng": null, "description": "山麓生態林，楓紅步道", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%E6%BC%A2%EF%A5%9B+%E7%94%9F%E6%85%8B%EF%A7%B4/data=!4m2!3m1!1s0x350cfd91eac759f3:0xa5a9ceaa4974a909"},
+{"id": 4, "category": "景點", "region": "東部", "name": "濟州 世界自然遺産中心", "name_kr": "제주세계자연유산센터", "lat": null, "lng": null, "description": "火山島世界遺產展示館", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%E6%BF%9F%E5%B7%9E+%E4%B8%96%E7%95%8C%E8%87%AA%E7%84%B6%E9%81%BA%E7%94%A3%E4%B8%AD%E5%BF%83/data=!4m2!3m1!1s0x350d1b46fc90030b:0xb80436427308c467"},
+{"id": 5, "category": "景點", "region": "西部", "name": "군산오름", "name_kr": "군산오름", "lat": null, "lng": null, "description": "可開車上山頂，夕陽極美", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%EA%B5%B0%EC%82%B0%EC%98%A4%EB%A6%84/data=!4m2!3m1!1s0x350c5c94be73f997:0x33ec20927f7b3c7e"},
+{"id": 6, "category": "景點", "region": "東部", "name": "시인이생진시비거리", "name_kr": "시인 이생진 시비거리", "lat": null, "lng": null, "description": "城山的詩碑散步小街", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%EC%8B%9C%EC%9D%B8%EC%9D%B4%EC%83%9D%EC%A7%84%EC%8B%9C%EB%B9%84%EA%B1%B0%EB%A6%AC/data=!4m2!3m1!1s0x350d1597e489faa5:0x367b986e82db9a61"},
+{"id": 7, "category": "景點", "region": "西部", "name": "挾才海水浴場", "name_kr": "협재해수욕장", "lat": 33.3942945, "lng": 126.2398813, "description": "飛揚島夕陽，翡翠沙灘", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%E6%8C%BE%E6%89%8D%E6%B5%B7%E6%B0%B4%E6%B5%B4%E5%A0%B4/data=!4m2!3m1!1s0x350c6100c373b0f1:0x6ce2ce2c47a28400"},
+{"id": 8, "category": "景點", "region": "市區", "name": "사름 SAREUM", "name_kr": "사름", "lat": null, "lng": null, "description": "市區的生活選物小店", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%EC%82%AC%EB%A6%84+SAREUM/data=!4m2!3m1!1s0x350cfb0030d4092d:0x1b885455e0ff09c5"},
+{"id": 9, "category": "景點", "region": "東部", "name": "山君不離", "name_kr": "산굼부리", "lat": null, "lng": null, "description": "秋芒名所，傍晚最美", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%E5%B1%B1%E5%90%9B%E4%B8%8D%E9%9B%A2/data=!4m2!3m1!1s0x350d03673226cef1:0x98be8b4b12c52b75"},
+{"id": 10, "category": "景點", "region": "東部", "name": "31", "name_kr": "제주시 구좌읍 세화합전2길 31-1", "lat": null, "lng": null, "description": "10/26 換住的細花住宿", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/31/data=!4m2!3m1!1s0x350d167c63a7b7d1:0x3aa5708ccd3a73ec"},
+{"id": 11, "category": "景點", "region": "涯月", "name": "스마일애월", "name_kr": "스마일애월", "lat": null, "lng": null, "description": "涯月的雜貨小舖", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%EC%8A%A4%EB%A7%88%EC%9D%BC%EC%95%A0%EC%9B%94/data=!4m2!3m1!1s0x350cf5001679df21:0xe07051496c99e378"},
+{"id": 12, "category": "景點", "region": "市區", "name": "온컬렉션뮤지엄", "name_kr": "온컬렉션뮤지엄", "lat": null, "lng": null, "description": "小型私人收藏展示館", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%EC%98%A8%EC%BB%AC%EB%A0%89%EC%85%98%EB%AE%A4%EC%A7%80%EC%97%84/data=!4m2!3m1!1s0x350cfb50d6a43ffb:0xeab079fd197f78b"},
+{"id": 13, "category": "景點", "region": "東部", "name": "Daily Stitch", "name_kr": "dailystitch", "lat": 33.5419995, "lng": 126.6640605, "description": "咸德的刺繡雜貨小店", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/Daily+Stitch/data=!4m2!3m1!1s0x350ce2e67191f38b:0x61a1dca91586c753"},
+{"id": 14, "category": "景點", "region": "西部", "name": "沙溪海岸", "name_kr": "사계해안", "lat": 33.2231459, "lng": 126.297477, "description": "遠望兄弟島的黑沙海岸", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%E6%B2%99%E6%BA%AA%E6%B5%B7%E5%B2%B8/data=!4m2!3m1!1s0x350c43dfaeea13c3:0x2546acd773084eed"},
+{"id": 15, "category": "景點", "region": "東部", "name": "Ttarabi Oreum", "name_kr": "따라비오름", "lat": 33.3870582, "lng": 126.7534582, "description": "오름女王，來回約一小時", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/Ttarabi+Oreum/data=!4m2!3m1!1s0x350d05a4217b2df3:0x473a94e5433f79b5"},
+{"id": 16, "category": "景點", "region": "市區", "name": "D&DEPARTMENT JEJU by ARARIO", "name_kr": "디앤디파트먼트 제주 바이 아라리오", "lat": 33.5176855, "lng": 126.5234639, "description": "濟州在地設計生活選物", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/D%26DEPARTMENT+JEJU+by+ARARIO/data=!4m2!3m1!1s0x350ce399db600891:0x26e2db239c7f35c2"},
+{"id": 17, "category": "景點", "region": "西歸浦", "name": "1100高地 休憩所", "name_kr": "1100고지 휴게소", "lat": 33.3577959, "lng": 126.4624949, "description": "1100公路最高點的濕地", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/1100%E9%AB%98%E5%9C%B0+%E4%BC%91%E6%86%A9%E6%89%80/data=!4m2!3m1!1s0x350c57c0decbb733:0xd9bf1dcb826c5b1a"},
+{"id": 18, "category": "景點", "region": "涯月", "name": "고내리 바닷길 포토스팟", "name_kr": "고내리 바닷길 포토스팟", "lat": 33.4666262, "lng": 126.3346484, "description": "高內里海邊拍照熱點", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%EA%B3%A0%EB%82%B4%EB%A6%AC+%EB%B0%94%EB%8B%B7%EA%B8%B8+%ED%8F%AC%ED%86%A0%EC%8A%A4%ED%8C%9F/data=!4m2!3m1!1s0x350cf50032a45cdf:0x5dca902b7ffde8ef"},
+{"id": 19, "category": "景點", "region": "西部", "name": "Leude", "name_kr": "르데", "lat": 33.2489465, "lng": 126.3220571, "description": "沙溪的選物與禮品店", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/Leude/data=!4m2!3m1!1s0x350c430014d195f3:0x37e88db1ffd1a678"},
+{"id": 20, "category": "購物", "region": "市區", "name": "Artbox Jeju Yeondong", "name_kr": "아트박스 제주연동점", "lat": 33.4877006, "lng": 126.4910151, "description": "韓國連鎖文具雜貨店", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/Artbox+Jeju+Yeondong/data=!4m2!3m1!1s0x350cfb6ebcdb0409:0x5acd06b226d785fb"},
+{"id": 21, "category": "景點", "region": "東部", "name": "新川牧場", "name_kr": "신천목장", "lat": 33.3567015, "lng": 126.8682182, "description": "海邊牧草地，冬鋪橘皮", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%E6%96%B0%E5%B7%9D%E7%89%A7%E5%A0%B4/data=!4m2!3m1!1s0x350d0e8e7c78eea1:0xc6f96777dfd33086"},
+{"id": 22, "category": "景點", "region": "市區", "name": "Bigpokes", "name_kr": "빅포켓", "lat": 33.5129348, "lng": 126.5214933, "description": "觀德路上的雜貨禮品店", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/Bigpokes/data=!4m2!3m1!1s0x350ce589ed15ff97:0xb3f8a7f607405cb8"},
+{"id": 23, "category": "景點", "region": "東部", "name": "Hamdeok Beach", "name_kr": "함덕해수욕장", "lat": 33.5434231, "lng": 126.6697752, "description": "濟州最有名的碧綠海灘", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/Hamdeok+Beach/data=!4m2!3m1!1s0x350cfcafaaf72b55:0xf0d2596ca578b870"},
+{"id": 24, "category": "購物", "region": "涯月", "name": "Heisan Jeju Flagship Store", "name_kr": "헤이산 제주", "lat": 33.463027, "lng": 126.3097897, "description": "涯月的服飾品牌旗艦店", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/Heisan+Jeju+Flagship+Store/data=!4m2!3m1!1s0x350cf5440de1b0bf:0x68e1c1531b138e33"},
+{"id": 25, "category": "購物", "region": "西部", "name": "수풀 제주 스토어", "name_kr": "수풀 제주 스토어", "lat": 33.4179013, "lng": 126.2666193, "description": "設計家飾選物店", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%EC%88%98%ED%92%80+%EC%A0%9C%EC%A3%BC+%EC%8A%A4%ED%86%A0%EC%96%B4/data=!4m2!3m1!1s0x350c5f9dadce38e9:0xeba87f2d520f9225"},
+{"id": 26, "category": "景點", "region": "東部", "name": "Lu-Inhom", "name_kr": "루인홈", "lat": 33.5029546, "lng": 126.6942576, "description": "中山間路上的禮品雜貨", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/Lu-Inhom/data=!4m2!3m1!1s0x350d1d4bb667516d:0xc71079bddf7f61c6"},
+{"id": 27, "category": "景點", "region": "市區", "name": "Mulyohi", "name_kr": "무료히", "lat": 33.5100889, "lng": 126.5235413, "description": "市區巷內的雜貨小舖", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/Mulyohi/data=!4m2!3m1!1s0x350ce3003be93445:0xd7f0ce24ff7373cb"},
+{"id": 28, "category": "景點", "region": "市區", "name": "hetras Jeju", "name_kr": "헤트라스 제주", "lat": 33.4901546, "lng": 126.4899427, "description": "濟州的美妝保養品店", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/hetras+Jeju/data=!4m2!3m1!1s0x350cfb3099c6ddc1:0xa1f4452f935524b0"},
+{"id": 29, "category": "景點", "region": "市區", "name": "8 Gwandeok-ro", "name_kr": "관덕로 8", "lat": 33.5127489, "lng": 126.5202265, "description": "觀德路8號的選物店", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/8+Gwandeok-ro/data=!4m2!3m1!1s0x350ce4aafd8173ad:0x3203785115d0afcb"},
+{"id": 30, "category": "景點", "region": "市區", "name": "MyLittleJinji 마이리틀진지", "name_kr": "마이리틀진지", "lat": 33.5029707, "lng": 126.463959, "description": "道頭洞飾品時尚小店", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/MyLittleJinji+%EB%A7%88%EC%9D%B4%EB%A6%AC%ED%8B%80%EC%A7%84%EC%A7%80/data=!4m2!3m1!1s0x350cfb214507905f:0x8ebfce50ae5d1317"},
+{"id": 31, "category": "景點", "region": "市區", "name": "엠와이제주", "name_kr": "엠와이제주", "lat": 33.4901323, "lng": 126.4905208, "description": "三無路上的禮品雜貨", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%EC%97%A0%EC%99%80%EC%9D%B4%EC%A0%9C%EC%A3%BC/data=!4m2!3m1!1s0x350cfb003cd30045:0xa0537b2852d3c049"},
+{"id": 32, "category": "景點", "region": "涯月", "name": "Assisi", "name_kr": "애월 아시시", "lat": 33.4778079, "lng": 126.3550408, "description": "涯月香水店，可做濟州香", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/Assisi/data=!4m2!3m1!1s0x350cf7c18e7666c3:0x715e67b4e43f267f"},
+{"id": 33, "category": "購物", "region": "涯月", "name": "탱글(소품샵)", "name_kr": "탱글", "lat": 33.4656631, "lng": 126.3200485, "description": "涯月的小物雜貨店", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%ED%83%B1%EA%B8%80(%EC%86%8C%ED%92%88%EC%83%B5)/data=!4m2!3m1!1s0x350cf50043825c7b:0xb170e3182091e792"},
+{"id": 34, "category": "購物", "region": "涯月", "name": "던스트 제주 플래그십 스토어", "name_kr": "던스트 제주 플래그십 스토어", "lat": 33.4625151, "lng": 126.3094702, "description": "DUNST 濟州旗艦店", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%EB%8D%98%EC%8A%A4%ED%8A%B8+%EC%A0%9C%EC%A3%BC+%ED%94%8C%EB%9E%98%EA%B7%B8%EC%8B%AD+%EC%8A%A4%ED%86%A0%EC%96%B4/data=!4m2!3m1!1s0x350cf50d2c2c2529:0x7a8beb91646ca44a"},
+{"id": 35, "category": "景點", "region": "市區", "name": "메르시제주", "name_kr": "메르시제주", "lat": 33.5145824, "lng": 126.5129743, "description": "濟州伴手禮專賣店", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%EB%A9%94%EB%A5%B4%EC%8B%9C%EC%A0%9C%EC%A3%BC+%7C+%E6%BF%9F%E5%B7%9E%E5%B3%B6%E7%B4%80%E5%BF%B5%E5%93%81+%7C+%E6%BF%9F%E5%B7%9E%E5%B3%B6%E4%BC%B4%E6%89%8B%E7%A6%AE+%7C+MERCI+JEJU+SOUVENIR+SHOP+%7C/data=!4m2!3m1!1s0x350ce522dc44004d:0x2438ef51fd9e076d"},
+{"id": 36, "category": "景點", "region": "西歸浦", "name": "甫木浦口階段", "name_kr": "보목포구계단", "lat": 33.2395268, "lng": 126.6073589, "description": "退潮才露出的海中階梯", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%E7%94%AB%E6%9C%A8%E6%B5%A6%E5%8F%A3%E9%9A%8E%E6%AE%B5/data=!4m2!3m1!1s0x350c53005e934907:0xd24ce28e73edcfd0"},
+{"id": 37, "category": "景點", "region": "東部", "name": "세기알해변", "name_kr": "세기알해변", "lat": 33.558169, "lng": 126.7553943, "description": "金寧小海灣，浮潛點", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%EC%84%B8%EA%B8%B0%EC%95%8C%ED%95%B4%EB%B3%80/data=!4m2!3m1!1s0x350d19184f7d0061:0xfe15ecc10c2c6277"},
+{"id": 38, "category": "景點", "region": "市區", "name": "모아이 MOI", "name_kr": "모아이 MOI", "lat": 33.5129041, "lng": 126.5344251, "description": "東門路的禮品選物店", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%EB%AA%A8%EC%95%84%EC%9D%B4+MOI/data=!4m2!3m1!1s0x350ce337975caadf:0x8f28911a5c85cb09"},
+{"id": 39, "category": "景點", "region": "東部", "name": "城山日出峰", "name_kr": "성산일출봉", "lat": 33.458056, "lng": 126.9425, "description": "世界遺產火山口，看日出", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%E5%9F%8E%E5%B1%B1%E6%97%A5%E5%87%BA%E5%B3%B0/data=!4m2!3m1!1s0x350d14b9f6e3789f:0x555132053a23b64b"},
+{"id": 40, "category": "景點", "region": "西部", "name": "龍頭海岸", "name_kr": "용머리해안", "lat": 33.2316155, "lng": 126.3148321, "description": "山房山下層積岩海岸", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%E9%BE%8D%E9%A0%AD%E6%B5%B7%E5%B2%B8/data=!4m2!3m1!1s0x350c4307a770e15b:0x5f8461d229ddab28"},
+{"id": 41, "category": "景點", "region": "西部", "name": "オソルロック・ティー・ミュージアム", "name_kr": "오설록 티 뮤지엄", "lat": 33.3059385, "lng": 126.2894355, "description": "綠茶園裡的茶博物館", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%E3%82%AA%E3%82%BD%E3%83%AB%E3%83%AD%E3%83%83%E3%82%AF%E3%83%BB%E3%83%86%E3%82%A3%E3%83%BC%E3%83%BB%E3%83%9F%E3%83%A5%E3%83%BC%E3%82%B8%E3%82%A2%E3%83%A0/data=!4m2!3m1!1s0x350c5d1219ebcc11:0xb8a71289da43cad1"},
+{"id": 42, "category": "景點", "region": "東部", "name": "김녕해수욕장", "name_kr": "김녕해수욕장", "lat": 33.5582774, "lng": 126.759787, "description": "水色清透的金寧海水浴場", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%EA%B9%80%EB%85%95%ED%95%B4%EC%88%98%EC%9A%95%EC%9E%A5/data=!4m2!3m1!1s0x350d184767ce97e3:0x63f0205bf57e068f"},
+{"id": 43, "category": "景點", "region": "市區", "name": "aeae 제주점", "name_kr": "aeae 제주점", "lat": 33.5146606, "lng": 126.5264318, "description": "觀德路的女裝選物店", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/aeae+%EC%A0%9C%EC%A3%BC%EC%A0%90/data=!4m2!3m1!1s0x350ce3859622bef1:0xb56c08d61da85054"},
+{"id": 44, "category": "景點", "region": "市區", "name": "섬조각 somejogak", "name_kr": "섬조각", "lat": 33.5148942, "lng": 126.5273838, "description": "濟州風紀念品小店", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%EC%84%AC%EC%A1%B0%EA%B0%81+somejogak/data=!4m2!3m1!1s0x350ce339102c9b77:0xb3b53dae96e23a4a"},
+{"id": 45, "category": "景點", "region": "東部", "name": "오브젝트 제주점 Object Jeju Branch", "name_kr": "오브젝트 제주점", "lat": 33.5533877, "lng": 126.7156758, "description": "文創雜貨 Object 濟州店", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%EC%98%A4%EB%B8%8C%EC%A0%9D%ED%8A%B8+%EC%A0%9C%EC%A3%BC%EC%A0%90+Object+Jeju+Branch/data=!4m2!3m1!1s0x350d19001294129d:0xb018f43394d06bd5"},
+{"id": 46, "category": "景點", "region": "東部", "name": "金寧海邊 海岸路", "name_kr": "김녕해변 바닷길", "lat": 33.5578652, "lng": 126.7488633, "description": "金寧海邊散步海岸路", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%E9%87%91%E5%AF%A7%E6%B5%B7%E9%82%8A+%E6%B5%B7%E5%B2%B8%E8%B7%AF/data=!4m2!3m1!1s0x350d19216549061f:0x38836d0a5826c23"},
+{"id": 47, "category": "景點", "region": "市區", "name": "102 Jejudaehak-ro", "name_kr": "제주대학로 102", "lat": 33.4547583, "lng": 126.5622562, "description": "濟州大學路銀杏行道樹", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/102+Jejudaehak-ro/data=!4m2!3m1!1s0x350cfc5432e1687b:0x42f0fde11e1da7b"},
+{"id": 48, "category": "景點", "region": "市區", "name": "제주대학교 은행나무길", "name_kr": "제주대학교 은행나무길", "lat": 33.4585903, "lng": 126.5572137, "description": "濟州大學校內銀杏大道", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%EC%A0%9C%EC%A3%BC%EB%8C%80%ED%95%99%EA%B5%90+%EC%9D%80%ED%96%89%EB%82%98%EB%AC%B4%EA%B8%B8/data=!4m2!3m1!1s0x350cfd5dfc7992b9:0xa744dce455d2ee54"},
+{"id": 49, "category": "景點", "region": "漢拏山", "name": "御里牧溪谷", "name_kr": "어리목계곡", "lat": 33.3891192, "lng": 126.4942262, "description": "漢拏山入口溪谷，賞楓", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%E5%BE%A1%E9%87%8C%E7%89%A7%E6%BA%AA%E8%B0%B7/data=!4m2!3m1!1s0x350cf8ee90ade509:0xd83c592c4cad812e"},
+{"id": 50, "category": "景點", "region": "市區", "name": "429 Sallokbuk-ro", "name_kr": "산록북로 429", "lat": 33.4246038, "lng": 126.5270026, "description": "山麓北路一帶賞楓路段", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/429+Sallokbuk-ro/data=!4m2!3m1!1s0x350cfea864349281:0x677c5c880e685811"},
+{"id": 51, "category": "景點", "region": "漢拏山", "name": "大韓佛敎曹溪宗 天王寺", "name_kr": "대한불교조계종 천왕사", "lat": 33.4087029, "lng": 126.4944197, "description": "漢拏山山腰寺廟，楓紅", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%E5%A4%A7%E9%9F%93%E4%BD%9B%E6%95%8E%E6%9B%B9%E6%BA%AA%E5%AE%97+%E5%A4%A9%E7%8E%8B%E5%AF%BA/data=!4m2!3m1!1s0x350cf922278eb235:0xc701fd212b850243"},
+{"id": 52, "category": "景點", "region": "涯月", "name": "天娥溪谷", "name_kr": "천아계곡", "lat": 33.3971528, "lng": 126.459872, "description": "濟州最有名的賞楓溪谷", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%E5%A4%A9%E5%A8%A5%E6%BA%AA%E8%B0%B7/data=!4m2!3m1!1s0x350cf9be320a1211:0x70fdb9131ea4a762"},
+{"id": 53, "category": "購物", "region": "東部", "name": "제주사슴책방", "name_kr": "제주사슴책방", "lat": 33.4958502, "lng": 126.6588722, "description": "朝天森林裡的獨立書店", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%EC%A0%9C%EC%A3%BC%EC%82%AC%EC%8A%B4%EC%B1%85%EB%B0%A9/data=!4m2!3m1!1s0x350d1d7b1517fff1:0x460f835014545bcc"},
+{"id": 54, "category": "景點", "region": "市區", "name": "took", "name_kr": "took", "lat": 33.5109247, "lng": 126.5213179, "description": "中央路巷內的禮品小店", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/took/data=!4m2!3m1!1s0x350ce50cedd1a483:0xab629b361bc04c6e"},
+{"id": 55, "category": "購物", "region": "市區", "name": "웨이브먼트 소품샵", "name_kr": "웨이브먼트", "lat": 33.5029732, "lng": 126.4639915, "description": "西海岸路的小物雜貨", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%EC%9B%A8%EC%9D%B4%EB%B8%8C%EB%A8%BC%ED%8A%B8+%EC%86%8C%ED%92%88%EC%83%B5/data=!4m2!3m1!1s0x350cfb004660cbaf:0x760033381355f996"},
+{"id": 56, "category": "景點", "region": "市區", "name": "슬로모 slo-mo", "name_kr": "슬로모", "lat": 33.5134763, "lng": 126.52814, "description": "山地路的選物店", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%EC%8A%AC%EB%A1%9C%EB%AA%A8+slo-mo/data=!4m2!3m1!1s0x350ce3001122f573:0x9e1804ccb5b05fed"},
+{"id": 57, "category": "景點", "region": "市區", "name": "Gyulmedal", "name_kr": "귤메달", "lat": 33.5171238, "lng": 126.5229357, "description": "橘子主題甜點咖啡店", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/Gyulmedal/data=!4m2!3m1!1s0x350ce5a1374f337d:0x5225c899a5f4fedd"},
+{"id": 58, "category": "購物", "region": "市區", "name": "gyulgyulstore", "name_kr": "귤귤스토어 도두점", "lat": 33.5087904, "lng": 126.471508, "description": "橘子主題紀念品店", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/gyulgyulstore/data=!4m2!3m1!1s0x350cfb3621d32435:0xaf36e459a833212"},
+{"id": 59, "category": "景點", "region": "市區", "name": "무드제주 (MOOD JEJU)", "name_kr": "무드제주", "lat": 33.5077651, "lng": 126.5152691, "description": "香氛與生活選物店", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%EB%AC%B4%EB%93%9C%EC%A0%9C%EC%A3%BC+(MOOD+JEJU)/data=!4m2!3m1!1s0x350cfbcfe39cd663:0x438acc703aeba771"},
+{"id": 60, "category": "景點", "region": "東部", "name": "杏源海灘 (柯南海灘)", "name_kr": "행원해변(코난해변)", "lat": 33.5575318, "lng": 126.8112241, "description": "因柯南場景走紅的海邊", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%E6%9D%8F%E6%BA%90%E6%B5%B7%E7%81%98+(%E6%9F%AF%E5%8D%97%E6%B5%B7%E7%81%98)/data=!4m2!3m1!1s0x350d179c3747e191:0x7a3b288b0d2e0911"},
+{"id": 61, "category": "景點", "region": "東部", "name": "萬丈窟", "name_kr": "만장굴", "lat": 33.5281972, "lng": 126.7717618, "description": "世界最長熔岩洞窟之一", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%E8%90%AC%E4%B8%88%E7%AA%9F/data=!4m2!3m1!1s0x350d19c496216a99:0xbb66abf00c2b95a6"},
+{"id": 62, "category": "購物", "region": "東部", "name": "소심한책방", "name_kr": "소심한책방", "lat": 33.4905308, "lng": 126.9028043, "description": "終達里的人氣獨立書店", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%EC%86%8C%EC%8B%AC%ED%95%9C%EC%B1%85%EB%B0%A9/data=!4m2!3m1!1s0x350d1453d29e1905:0x70ffbddfdf31e4d1"},
+{"id": 63, "category": "景點", "region": "東部", "name": "달리센트", "name_kr": "달리센트", "lat": 33.4903833, "lng": 126.8986919, "description": "終達里的香氛生活小店", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%EB%8B%AC%EB%A6%AC%EC%84%BC%ED%8A%B8/data=!4m2!3m1!1s0x350d15e3548dc69b:0x178606cce6d5296"},
+{"id": 64, "category": "景點", "region": "東部", "name": "근자c가게", "name_kr": "근자c가게", "lat": 33.4959526, "lng": 126.9013236, "description": "終達里的雜貨小店", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%EA%B7%BC%EC%9E%90c%EA%B0%80%EA%B2%8C/data=!4m2!3m1!1s0x350d1452b1503ef5:0xdeb8f74501bfee7a"},
+{"id": 65, "category": "餐廳", "region": "西歸浦", "name": "하영점빵", "name_kr": "하영점빵", "lat": null, "lng": null, "description": "烤白帶魚、辣牛排骨", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%ED%95%98%EC%98%81%EC%A0%90%EB%B9%B5/data=!4m2!3m1!1s0x350c5300056e0877:0x356f771ecdcb4cd8"},
+{"id": 66, "category": "餐廳", "region": "西歸浦", "name": "제일수산횟집", "name_kr": "제일수산횟집", "lat": null, "lng": null, "description": "抹茶特色甜點與生魚片", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%EC%A0%9C%EC%9D%BC%EC%88%98%EC%82%B0%ED%9A%9F%EC%A7%91/data=!4m2!3m1!1s0x350c539b83e2f251:0xa7d74a041bf995d8"},
+{"id": 67, "category": "餐廳", "region": "西歸浦", "name": "穡達食堂 西歸浦本店", "name_kr": "색달식당 서귀포본점", "lat": null, "lng": null, "description": "花生麵包與海鮮鍋", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%E7%A9%A1%E9%81%94%E9%A3%9F%E5%A0%82+%E8%A5%BF%E6%AD%B8%E6%B5%A6%E6%9C%AC%E5%BA%97/data=!4m2!3m1!1s0x350c5aeadfbcfc29:0x8ed08a8f4cd3144d"},
+{"id": 68, "category": "餐廳", "region": "西部", "name": "Gray Grove", "name_kr": "그레이그로브", "lat": null, "lng": null, "description": "大蒜麵包，景觀好", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/Gray+Grove/data=!4m2!3m1!1s0x350c439a61ddebc3:0xf0592cf8a12690ff"},
+{"id": 69, "category": "餐廳", "region": "西部", "name": "Comma", "name_kr": "콤마", "lat": null, "lng": null, "description": "需預約的小店", "hours": "需預約", "gmaps": "https://www.google.com/maps/place/Comma/data=!4m2!3m1!1s0x350c60ba40b88a51:0x735dfca92412990"},
+{"id": 70, "category": "餐廳", "region": "市區", "name": "城山別曲", "name_kr": "성산별곡", "lat": null, "lng": null, "description": "韓式定食小館", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%E5%9F%8E%E5%B1%B1%E5%88%A5%E6%9B%B2/data=!4m2!3m1!1s0x350cfb6b8c13edc1:0x7907fed9a9796c59"},
+{"id": 71, "category": "咖啡廳", "region": "市區", "name": "무상찻집", "name_kr": "무상찻집", "lat": 33.5009806, "lng": 126.5144369, "description": "市區的安靜傳統茶館", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%EB%AC%B4%EC%83%81%EC%B0%BB%EC%A7%91/data=!4m2!3m1!1s0x350cfb29abc600ab:0xcbe286207cde115"},
+{"id": 72, "category": "咖啡廳", "region": "市區", "name": "Abebe Bakery Jeju", "name_kr": "아베베베이커리 제주", "lat": null, "lng": null, "description": "人氣麵包店，常排隊", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/Abebe+Bakery+Jeju/data=!4m2!3m1!1s0x350ce3434f4d3f6b:0x3f76276ef62b22d8"},
+{"id": 73, "category": "咖啡廳", "region": "東部", "name": "Audrant Bakery", "name_kr": "오드랑베이커리", "lat": null, "lng": null, "description": "咸德老字號麵包店", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/Audrant+Bakery/data=!4m2!3m1!1s0x350d1e9e55555555:0x1daf3f0bd4fdcc2a"},
+{"id": 74, "category": "餐廳", "region": "涯月", "name": "바다술상", "name_kr": "바다술상", "lat": null, "lng": null, "description": "看海的小酒館", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%EB%B0%94%EB%8B%A4%EC%88%A0%EC%83%81/data=!4m2!3m1!1s0x350cf5005c5a9eaf:0xfdbf900b49f5248d"},
+{"id": 75, "category": "餐廳", "region": "西部", "name": "Beryl", "name_kr": "베릴", "lat": 33.3975848, "lng": 126.2425697, "description": "挾才海景咖啡，no kids", "hours": "13 歲以下不可入場", "gmaps": "https://www.google.com/maps/place/Beryl/data=!4m2!3m1!1s0x350c61af7db1848b:0x9d67c543f09a5b29"},
+{"id": 76, "category": "餐廳", "region": "東部", "name": "늘보의 작업실", "name_kr": "늘보의 작업실", "lat": 33.4959396, "lng": 126.8998255, "description": "終達里義式早午餐小館", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%EB%8A%98%EB%B3%B4%EC%9D%98+%EC%9E%91%EC%97%85%EC%8B%A4/data=!4m2!3m1!1s0x350d15d7fe23ebb9:0xeb137f484558cf5c"},
+{"id": 77, "category": "餐廳", "region": "東部", "name": "가는곶 세화", "name_kr": "가는곶 세화", "lat": 33.5205393, "lng": 126.8606225, "description": "細花海邊的石屋咖啡廳", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%EA%B0%80%EB%8A%94%EA%B3%B6+%EC%84%B8%ED%99%94/data=!4m2!3m1!1s0x350d179ff0a7a4b5:0xd6a66cb5fade59e3"},
+{"id": 78, "category": "餐廳", "region": "市區", "name": "여정", "name_kr": "여정", "lat": 33.4945631, "lng": 126.5452162, "description": "平價私廚韓食，需預訂", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%EC%97%AC%EC%A0%95/data=!4m2!3m1!1s0x350cfd006a919bdf:0x96b19d38ad6241be"},
+{"id": 79, "category": "餐廳", "region": "市區", "name": "丈母食卓", "name_kr": "장모식탁", "lat": 33.4971067, "lng": 126.546788, "description": "鮑魚石鍋飯與醬蟹", "hours": "需預約・週日休", "gmaps": "https://www.google.com/maps/place/%E4%B8%88%E6%AF%8D%E9%A3%9F%E5%8D%93/data=!4m2!3m1!1s0x350cfcc98099c5db:0x599f9624485fd2a0"},
+{"id": 80, "category": "咖啡廳", "region": "東部", "name": "Café Delmoondo", "name_kr": "델문도", "lat": 33.5437787, "lng": 126.6688353, "description": "咸德海邊人氣烘豆咖啡", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/Caf%C3%A9+Delmoondo/data=!4m2!3m1!1s0x350d1e9961b5bd7f:0xe16f5406dbb863a4"},
+{"id": 81, "category": "餐廳", "region": "西部", "name": "생원전복", "name_kr": "생원전복", "lat": 33.2458179, "lng": 126.3307228, "description": "鮑魚石鍋拌飯專門店", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%EC%83%9D%EC%9B%90%EC%A0%84%EB%B3%B5/data=!4m2!3m1!1s0x350c43404c90de1f:0xbf9413ca7cfd9fe4"},
+{"id": 82, "category": "餐廳", "region": "西歸浦", "name": "Nogorok", "name_kr": "노고록", "lat": 33.2524181, "lng": 126.4266798, "description": "口碑極高的韓食小店", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/Nogorok/data=!4m2!3m1!1s0x350c5b001d98b959:0x146dbb4434b50966"},
+{"id": 83, "category": "餐廳", "region": "市區", "name": "DOTOREE Kitchen", "name_kr": "도토리키친 본점", "lat": 33.5153877, "lng": 126.5186172, "description": "橘子蕎麥麵，建議訂位", "hours": "10:30–17:00・建議預約", "gmaps": "https://www.google.com/maps/place/DOTOREE+Kitchen/data=!4m2!3m1!1s0x350d1b69963f852f:0xf01e7f2c95267210"},
+{"id": 84, "category": "餐廳", "region": "西部", "name": "豚魚吉", "name_kr": "돈어길", "lat": 33.28076, "lng": 126.2854572, "description": "黑豬肉燒烤與冷麵", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%E8%B1%9A%E9%AD%9A%E5%90%89/data=!4m2!3m1!1s0x350c5db490ee2cdb:0x88a2f71838b4064"},
+{"id": 85, "category": "餐廳", "region": "涯月", "name": "靑草水水拌生魚片 濟州店", "name_kr": "청초수물회 제주점", "lat": 33.4566582, "lng": 126.3091233, "description": "水拌生魚片與鮑魚粥名店", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%E9%9D%91%E8%8D%89%E6%B0%B4%E6%B0%B4%E6%8B%8C%E7%94%9F%E9%AD%9A%E7%89%87+%E6%BF%9F%E5%B7%9E%E5%BA%97/data=!4m2!3m1!1s0x350cf5207b32f2af:0x1a62d4e02cafe156"},
+{"id": 86, "category": "餐廳", "region": "東部", "name": "Jeomjeom", "name_kr": "점점", "lat": 33.537233, "lng": 126.6153298, "description": "新村里海邊安靜咖啡廳", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/Jeomjeom/data=!4m2!3m1!1s0x350d1d8148987c97:0xde6c20a901d7d411"},
+{"id": 87, "category": "餐廳", "region": "市區", "name": "Shinjeju Bomal Kalguksu", "name_kr": "신제주보말칼국수 제주본점", "lat": 33.4879343, "lng": 126.500021, "description": "海螺刀削麵本店", "hours": "08:00–15:00・週日休", "gmaps": "https://www.google.com/maps/place/Shinjeju+Bomal+Kalguksu/data=!4m2!3m1!1s0x350cfb0d429c8993:0xcfeb2825f3149841"},
+{"id": 88, "category": "餐廳", "region": "西部", "name": "島豚 挾才黑豬肉", "name_kr": "도돈 협재흑돼지", "lat": 33.3947961, "lng": 126.2415901, "description": "挾才黑豬肉炭火燒烤", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%E5%B3%B6%E8%B1%9A+%E6%8C%BE%E6%89%8D%E9%BB%91%E8%B1%AC%E8%82%89/data=!4m2!3m1!1s0x350c610029f6fc0b:0x6c3be7f135145ec6"},
+{"id": 89, "category": "餐廳", "region": "西部", "name": "Haehwatang", "name_kr": "해화탕", "lat": 33.4433921, "lng": 126.2915933, "description": "翰林一帶的咖啡廳", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/Haehwatang/data=!4m2!3m1!1s0x350cf500514505a1:0xd9457e0af0a94965"},
+{"id": 90, "category": "餐廳", "region": "東部", "name": "오드리 김밥", "name_kr": "오드리 김밥", "lat": 33.4631382, "lng": 126.9334513, "description": "城山旁的紫菜飯捲店", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%EC%98%A4%EB%93%9C%EB%A6%AC+%EA%B9%80%EB%B0%A5/data=!4m2!3m1!1s0x350d15a1c3203a7b:0xc76a6e6d63217053"},
+{"id": 91, "category": "餐廳", "region": "市區", "name": "Gogugsu", "name_kr": "고국수", "lat": 33.5064195, "lng": 126.509232, "description": "早上限定的帶魚湯麵", "hours": "帶魚湯麵至 10:00", "gmaps": "https://www.google.com/maps/place/Gogugsu/data=!4m2!3m1!1s0x350cfb4f0971075f:0xd10cb09e663a435e"},
+{"id": 92, "category": "餐廳", "region": "東部", "name": "季節食卓 咸德店", "name_kr": "계절식탁 함덕점", "lat": 33.5425961, "lng": 126.6674297, "description": "咸德海邊的季節韓式定食", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%E5%AD%A3%E7%AF%80%E9%A3%9F%E5%8D%93+%E5%92%B8%E5%BE%B7%E5%BA%97/data=!4m2!3m1!1s0x350d1f1f715a326d:0x2891ca25b75d29df"},
+{"id": 93, "category": "餐廳", "region": "西歸浦", "name": "Ppolsaljip", "name_kr": "뽈살집", "lat": 33.2508339, "lng": 126.5628867, "description": "西歸浦的豬頰肉燒烤", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/Ppolsaljip/data=!4m2!3m1!1s0x350c539c55c10f71:0x3295985b068bb521"},
+{"id": 94, "category": "餐廳", "region": "市區", "name": "Iltong Iban", "name_kr": "일통이반", "lat": 33.5170648, "lng": 126.5221484, "description": "市區中央路海鮮料理", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/Iltong+Iban/data=!4m2!3m1!1s0x350ce4a9d5e14011:0x2025d5df2e52287f"},
+{"id": 95, "category": "餐廳", "region": "涯月", "name": "熟成到 涯月店", "name_kr": "숙성도 애월점", "lat": 33.463515, "lng": 126.3096504, "description": "熟成黑豬肉名店涯月分店", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%E7%86%9F%E6%88%90%E5%88%B0+%E6%B6%AF%E6%9C%88%E5%BA%97/data=!4m2!3m1!1s0x350cf5376a720e8b:0xb3812aa6ac650454"},
+{"id": 96, "category": "咖啡廳", "region": "東部", "name": "Floyeast Bakery Cafe", "name_kr": "플로이스트 베이커리 카페", "lat": 33.4291562, "lng": 126.9338099, "description": "城山的烘焙咖啡館", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/Floyeast+Bakery+Cafe/data=!4m2!3m1!1s0x350d130006ad457f:0x6e905e0a24cbac63"},
+{"id": 97, "category": "咖啡廳", "region": "東部", "name": "Cafe Out Of Ordinary", "name_kr": "카페 아오오", "lat": 33.3791372, "lng": 126.8799189, "description": "城山環海路海景咖啡", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/Cafe+Out+Of+Ordinary/data=!4m2!3m1!1s0x350d13973971b137:0xb443b7e31a57491b"},
+{"id": 98, "category": "餐廳", "region": "西部", "name": "고결 고등어숯불반상", "name_kr": "고결 고등어숯불반상", "lat": 33.2068097, "lng": 126.2899923, "description": "炭烤鯖魚定食，望兄弟島", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%EA%B3%A0%EA%B2%B0+%EA%B3%A0%EB%93%B1%EC%96%B4%EC%88%AF%EB%B6%88%EB%B0%98%EC%83%81/data=!4m2!3m1!1s0x350c439205c7a713:0x98a415c26a3cb0ac"},
+{"id": 99, "category": "餐廳", "region": "西歸浦", "name": "老奶奶的年糕", "name_kr": "할머니떡집", "lat": 33.2486024, "lng": 126.5642223, "description": "偶來市場老字號年糕店", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%E8%80%81%E5%A5%B6%E5%A5%B6%E7%9A%84%E5%B9%B4%E7%B3%95/data=!4m2!3m1!1s0x350c539dc531ebef:0xb9d609457f494057"},
+{"id": 100, "category": "餐廳", "region": "西歸浦", "name": "麵條海洋 本店", "name_kr": "국수바다 본점", "lat": 33.253023, "lng": 126.447197, "description": "西歸浦豬肉湯麵老店", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%E9%BA%B5%E6%A2%9D%E6%B5%B7%E6%B4%8B+%E6%9C%AC%E5%BA%97/data=!4m2!3m1!1s0x350c5a97de6bc439:0xd72da3c9bd9b38fa"},
+{"id": 101, "category": "餐廳", "region": "西部", "name": "Miyoung's Sashimi", "name_kr": "미영이네", "lat": 33.2177388, "lng": 126.2498932, "description": "摹瑟浦生魚片名店", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/Miyoung's+Sashimi/data=!4m2!3m1!1s0x350c69f72c653503:0x735a1423dfdddac2"},
+{"id": 102, "category": "餐廳", "region": "西部", "name": "兄弟島海螺刀切麵", "name_kr": "형제섬보말칼국수", "lat": 33.2069012, "lng": 126.2902768, "description": "面對兄弟島的海螺刀削麵", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%E5%85%84%E5%BC%9F%E5%B3%B6%E6%B5%B7%E8%9E%BA%E5%88%80%E5%88%87%E9%BA%B5/data=!4m2!3m1!1s0x350c423bba5f6739:0x59e837b9cca35040"},
+{"id": 103, "category": "餐廳", "region": "東部", "name": "Tongbal", "name_kr": "통발", "lat": 33.4609516, "lng": 126.9341431, "description": "城山的居酒屋", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/Tongbal/data=!4m2!3m1!1s0x350d152b174b98b9:0xed1678ef1c86571c"},
+{"id": 104, "category": "餐廳", "region": "涯月", "name": "도토리 제주점", "name_kr": "도토리 제주점", "lat": 33.4632162, "lng": 126.3097137, "description": "涯月的人氣麵包店", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%EB%8F%84%ED%86%A0%EB%A6%AC+%EC%A0%9C%EC%A3%BC%EC%A0%90/data=!4m2!3m1!1s0x350cf50047202a4f:0xeae3b0fa977a0b45"},
+{"id": 105, "category": "餐廳", "region": "東部", "name": "Sogeumbachi Sooninae", "name_kr": "소금바치 순이네", "lat": 33.5035471, "lng": 126.9127463, "description": "海女風海鮮家常菜", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/Sogeumbachi+Sooninae/data=!4m2!3m1!1s0x350d150846ae2559:0xd6c53d0e7b976bfd"},
+{"id": 106, "category": "餐廳", "region": "東部", "name": "月高家 黑豬肉", "name_kr": "월고집 월정리고기집", "lat": 33.5533544, "lng": 126.7911073, "description": "月汀里黑豬肉燒烤", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%E6%9C%88%E9%AB%98%E5%AE%B6+%E9%BB%91%E8%B1%AC%E8%82%89/data=!4m2!3m1!1s0x350d172adde62f3d:0x60b565d5001399c4"},
+{"id": 107, "category": "餐廳", "region": "涯月", "name": "바담깨비애월회관", "name_kr": "바담깨비애월회관", "lat": 33.4838162, "lng": 126.3956061, "description": "涯月海岸路海鮮餐廳", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%EB%B0%94%EB%8B%B4%EA%B9%A8%EB%B9%84%EC%95%A0%EC%9B%94%ED%9A%8C%EA%B4%80/data=!4m2!3m1!1s0x350cf1de0822f097:0x421b901eb106f12b"},
+{"id": 108, "category": "餐廳", "region": "牛島", "name": "Blanc Rocher", "name_kr": "블랑로쉐", "lat": 33.5156863, "lng": 126.9580858, "description": "牛島上的咖啡廳", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/Blanc+Rocher/data=!4m2!3m1!1s0x350d4001de8a55a5:0x4407664131cf52d7"},
+{"id": 109, "category": "餐廳", "region": "市區", "name": "Modern Dombe", "name_kr": "모던돔베 공항본점", "lat": 33.4570687, "lng": 126.4860197, "description": "機場旁的돔베고기麵食", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/Modern+Dombe/data=!4m2!3m1!1s0x350cfbe9b32dd343:0x15786c0e93a18cda"},
+{"id": 110, "category": "咖啡廳", "region": "市區", "name": "Coffee Temple Jeju", "name_kr": "커피템플", "lat": 33.4781416, "lng": 126.5702901, "description": "濟州知名精品咖啡烘豆", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/Coffee+Temple+Jeju/data=!4m2!3m1!1s0x350cfd213f739b25:0xc42ea610142d6a43"},
+{"id": 111, "category": "咖啡廳", "region": "西歸浦", "name": "Cafe Gyulkkot Darak", "name_kr": "귤꽃다락", "lat": 33.2464249, "lng": 126.5225977, "description": "橘子園裡的咖啡廳", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/Cafe+Gyulkkot+Darak/data=!4m2!3m1!1s0x357b5b5937c887d1:0x49c86381b28349ab"},
+{"id": 112, "category": "咖啡廳", "region": "市區", "name": "Your Rice Cake", "name_kr": "유라케", "lat": 33.5073504, "lng": 126.504776, "description": "手作年糕甜點店", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/Your+Rice+Cake/data=!4m2!3m1!1s0x350cfb414d7ed325:0x958c808949701aeb"},
+{"id": 113, "category": "餐廳", "region": "市區", "name": "태광식당", "name_kr": "태광식당", "lat": 33.5126649, "lng": 126.5186913, "description": "塔洞路上的老式食堂", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%ED%83%9C%EA%B4%91%EC%8B%9D%EB%8B%B9/data=!4m2!3m1!1s0x350ce4ab6b263a73:0x4971547aec5bc188"},
+{"id": 114, "category": "餐廳", "region": "東部", "name": "London Bagel Museum Jeju", "name_kr": "런던베이글뮤지엄 제주점", "lat": 33.5535978, "lng": 126.7155939, "description": "人氣貝果店濟州分店", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/London+Bagel+Museum+Jeju/data=!4m2!3m1!1s0x350d1970b7a01c3b:0x9522d57871ef1c43"},
+{"id": 115, "category": "餐廳", "region": "東部", "name": "濟州韓麵家", "name_kr": "제주한면가", "lat": 33.5120324, "lng": 126.7000256, "description": "豬肉湯麵，豆豆飯飯推薦", "hours": "10:30–15:30", "gmaps": "https://www.google.com/maps/place/%E6%BF%9F%E5%B7%9E%E9%9F%93%E9%BA%B5%E5%AE%B6/data=!4m2!3m1!1s0x350d1bf419149e6b:0x92e96aec5a2fb688"},
+{"id": 116, "category": "餐廳", "region": "西歸浦", "name": "Kkotdwaeji Grill", "name_kr": "꽃돼지 연탄 구이", "lat": 33.242032, "lng": 126.4439877, "description": "中文洞的煤炭火烤豬肉", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/Kkotdwaeji+Grill/data=!4m2!3m1!1s0x350c500c50bbecd1:0x583650d5775fd1c2"},
+{"id": 117, "category": "餐廳", "region": "東部", "name": "so much more", "name_kr": "so much more", "lat": 33.5503288, "lng": 126.6948041, "description": "北村的咖啡廳", "hours": "週二休", "gmaps": "https://www.google.com/maps/place/so+much+more/data=!4m2!3m1!1s0x350d1f004af53b87:0x7a76b48c79db3b31"},
+{"id": 118, "category": "餐廳", "region": "牛島", "name": "Udo Sand", "name_kr": "우도샌드", "lat": 33.5162432, "lng": 126.9576266, "description": "牛島的甜點店", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/Udo+Sand/data=!4m2!3m1!1s0x350d410b354c9e39:0x55cc314b08679240"},
+{"id": 119, "category": "餐廳", "region": "東部", "name": "Oleun", "name_kr": "오른", "lat": 33.4741667, "lng": 126.9111111, "description": "城山海邊景觀咖啡廳", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/Oleun/data=!4m2!3m1!1s0x350d150051d5a409:0xc19375fa183ba71b"},
+{"id": 120, "category": "餐廳", "region": "東部", "name": "엉클프레즐하우스", "name_kr": "엉클프레즐하우스", "lat": 33.5413678, "lng": 126.6742925, "description": "咸德手作扭結餅專賣", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%EC%97%89%ED%81%B4%ED%94%84%EB%A0%88%EC%A6%90%ED%95%98%EC%9A%B0%EC%8A%A4/data=!4m2!3m1!1s0x350d1f9d1c09edb1:0xb6d6db4faae22596"},
+{"id": 121, "category": "咖啡廳", "region": "東部", "name": "駱駝咖啡 濟州店", "name_kr": "카멜커피 제주점", "lat": 33.5568768, "lng": 126.8098896, "description": "카멜커피的濟州海景店", "hours": "依店家公告", "gmaps": "https://www.google.com/maps/place/%E9%A7%B1%E9%A7%9D%E5%92%96%E5%95%A1+%E6%BF%9F%E5%B7%9E%E5%BA%97/data=!4m2!3m1!1s0x350d17001bae2799:0xcc709688d6b7c59b"}
 ];
 
 /* =========================================================
@@ -844,7 +1014,10 @@ function navSearch(q) {
 }
 function naverById(id) {
   const p = PLACES.find(x => x.id === id);
-  if (p) navRoute(p.lat, p.lng, p.name_kr);
+  if (!p) return;
+  // 有精準座標就走路線導航；沒有的就交給 Naver 用韓文名搜尋
+  if (p.lat && p.lng) navRoute(p.lat, p.lng, p.name_kr);
+  else navSearch(p.name_kr);
 }
 function copyKr(id) {
   const p = PLACES.find(x => x.id === id);
@@ -994,7 +1167,7 @@ let keyword = '';
 
 function renderPills() {
   const counts = { all: PLACES.length };
-  PLACES.forEach(p => counts[p.cat] = (counts[p.cat] || 0) + 1);
+  PLACES.forEach(p => counts[p.category] = (counts[p.category] || 0) + 1);
 
   document.getElementById('pills').innerHTML = PCATS.map(c => {
     const on = c.key === activeCat;
@@ -1017,9 +1190,10 @@ function renderPills() {
 function renderCards() {
   const kw = keyword.trim().toLowerCase();
   const list = PLACES.filter(p => {
-    if (activeCat !== 'all' && p.cat !== activeCat) return false;
+    if (activeCat !== 'all' && p.category !== activeCat) return false;
     if (!kw) return true;
-    return (p.name + ' ' + p.name_kr + ' ' + p.area + ' ' + p.desc + ' ' + (p.note || '')).toLowerCase().includes(kw);
+    return (p.name + ' ' + p.name_kr + ' ' + p.region + ' ' + p.description + ' ' + p.category)
+             .toLowerCase().includes(kw);
   });
 
   document.getElementById('count').textContent = list.length;
@@ -1031,7 +1205,7 @@ function renderCards() {
   }
 
   document.getElementById('cards').innerHTML = list.map(p => {
-    const c = pcat(p.cat);
+    const c = pcat(p.category);
     return `
     <article class="fade-in glass backdrop-blur-md ring-1 ring-white/70 shadow-sm rounded-4xl p-4">
       <div class="flex items-start gap-3.5">
@@ -1039,23 +1213,25 @@ function renderCards() {
           ${icon(c.icon, 'w-[19px] h-[19px]')}
         </div>
         <div class="min-w-0 flex-1">
-          <p class="text-[14.5px] font-bold text-forest leading-snug break-words">${p.name}</p>
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="font-mono text-[9.5px] tracking-[0.14em] ${CAT_FG[p.category] || 'text-ink-dim'}">${p.category}</span>
+            <span class="bg-sage-tint text-sage-deep rounded-full text-[10px] font-bold px-2 py-0.5">${p.region}</span>
+          </div>
+          <p class="text-[14.5px] font-bold text-forest leading-snug mt-1 break-words">${p.name}</p>
           ${p.name_kr !== p.name ? `<p class="font-mono text-[10.5px] text-ink-dim mt-0.5">${p.name_kr}</p>` : ''}
-          <p class="text-[11px] text-sage-deep font-medium mt-1 flex items-center gap-1">
-            ${icon('pin', 'w-3 h-3')}${p.area}</p>
         </div>
-        <span class="shrink-0 font-mono text-[9.5px] tracking-[0.12em] uppercase text-ink-dim">${c.label}</span>
       </div>
 
-      <p class="text-[12.5px] text-ink-mid leading-relaxed mt-3">${p.desc}</p>
-      ${p.note && !p.desc.includes(p.note)
-        ? `<p class="text-[12px] text-forest bg-lime-soft/70 rounded-xl px-3 py-2 mt-2.5 leading-relaxed">
-             <span class="font-bold">筆記</span>　${p.note}</p>` : ''}
+      <p class="text-[12.5px] text-ink-mid leading-relaxed mt-2.5">${p.description}</p>
+
+      <div class="flex items-center gap-1.5 mt-2 text-[11.5px] ${p.hours === '依店家公告' ? 'text-ink-dim' : 'text-forest font-semibold'}">
+        ${icon('clock', 'w-3.5 h-3.5')}<span>${p.hours}</span>
+      </div>
 
       <div class="flex gap-2 mt-3.5">
         <button onclick="naverById(${p.id})"
           class="flex-1 flex items-center justify-center gap-1.5 bg-naver active:brightness-95 text-white text-[12.5px] font-bold rounded-full py-2.5">
-          ${icon('nav', 'w-4 h-4')}Naver 導航
+          ${icon(p.lat ? 'nav' : 'search', 'w-4 h-4')}${p.lat ? 'Naver 導航' : 'Naver 搜尋'}
         </button>
         <a href="${p.gmaps}" target="_blank" rel="noopener"
           class="flex items-center justify-center gap-1.5 bg-gblue active:brightness-95 text-white text-[12.5px] font-bold rounded-full px-3.5 py-2.5">
