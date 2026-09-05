@@ -16,8 +16,8 @@
 <meta property="og:description" content="我們10月濟州島見~~~">
 <meta property="og:url" content="https://zona-chi.github.io/jeju-trip/">
 <meta property="og:locale" content="zh_TW">
-<meta property="og:image" content="https://zona-chi.github.io/jeju-trip/share-cover.jpg">
-<meta property="og:image:secure_url" content="https://zona-chi.github.io/jeju-trip/share-cover.jpg">
+<meta property="og:image" content="https://zona-chi.github.io/jeju-trip/share-cover.jpg?v=3">
+<meta property="og:image:secure_url" content="https://zona-chi.github.io/jeju-trip/share-cover.jpg?v=3">
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -25,7 +25,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="JEJU 2026">
 <meta name="twitter:description" content="我們10月濟州島見~~~">
-<meta name="twitter:image" content="https://zona-chi.github.io/jeju-trip/share-cover.jpg">
+<meta name="twitter:image" content="https://zona-chi.github.io/jeju-trip/share-cover.jpg?v=3">
 <!-- ===== / 分享預覽 ===== -->
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -108,6 +108,59 @@ window.tailwind && (tailwind.config = {
   input[type="search"]::-webkit-search-cancel-button { -webkit-appearance: none; }
   :focus-visible { outline: 2px solid #5A7A60; outline-offset: 2px; }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+  /* ---------- 載入畫面（純 CSS，不依賴 Tailwind） ---------- */
+  #boot {
+    position: fixed; inset: 0; z-index: 100;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+    background: #F3F5F2;
+    transition: opacity .45s ease;
+  }
+  #boot.gone { opacity: 0; pointer-events: none; }
+  #boot .be {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 10px; letter-spacing: .32em; padding-left: .32em; color: #3F7A4E;
+  }
+  #boot .bw {
+    font-family: "Plus Jakarta Sans", "Noto Sans TC", -apple-system, sans-serif;
+    font-weight: 800; font-size: 54px; line-height: 1; letter-spacing: -.03em; color: #4F955E;
+  }
+
+  /* 字標本身做漸層流動：深綠 → 亮綠 → 粉紅 的光由左往右掃過字面。
+     三個顏色直接取自山形素材：樹的深綠 #4F955E、山體亮綠 #4FBE7E、粉紅樹 #EEBDBC。
+     用 @supports 包起來——不支援 background-clip:text 的瀏覽器
+     會維持上面那條純色規則，不會變成一片透明看不見字。 */
+  @supports ((-webkit-background-clip: text) or (background-clip: text)) {
+    #boot .bw {
+      background-image: linear-gradient(135deg,
+        #4F955E 0%,  #4F955E 28%, #4FBE7E 37%,
+        #EEBDBC 44%, #EEBDBC 56%,
+        #4FBE7E 63%, #4F955E 72%, #4F955E 100%);
+      background-size: 300% 100%;
+      background-repeat: no-repeat;
+      -webkit-background-clip: text;
+              background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: boot-shimmer 2s ease-in-out infinite;
+    }
+  }
+  @keyframes boot-shimmer {
+    from { background-position: 100% 50%; }
+    to   { background-position:   0% 50%; }
+  }
+
+  /* 上方小字：跟字標錯開相位的呼吸感 */
+  #boot .be { animation: boot-breathe 2s ease-in-out infinite; animation-delay: -.7s; }
+  @keyframes boot-breathe {
+    0%, 100% { opacity: .45; }
+    50%      { opacity: 1; }
+  }
+
+  /* 關掉動態效果時：漸層停在起點＝純深綠字，小字全不透明，看起來就是一張靜止的封面 */
+  @media (prefers-reduced-motion: reduce) {
+    #boot .bw { background-position: 0% 50%; }
+    #boot .be { opacity: 1; }
+  }
 
   .fade-in { animation: fade .24s ease-out both; }
   @keyframes fade { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
@@ -232,6 +285,12 @@ window.tailwind && (tailwind.config = {
 
 </head>
 <body>
+
+<!-- 載入畫面：字型與版面就緒後淡出，最慢 2.4 秒一定收起來 -->
+<div id="boot" role="status" aria-label="載入中">
+  <p class="be">OCT 2026 &middot; 6 DAYS</p>
+  <p class="bw">JEJU</p>
+</div>
 <!-- ===== 最底層裝飾：柔和色塊 + 等高線 ===== -->
 <div class="deco" aria-hidden="true">
   <div class="deco-blobs"></div>
@@ -1320,6 +1379,28 @@ watchDays();
 renderPills();
 renderCards();
 switchTab('plan');
+
+/* ---------- 收起載入畫面 ---------- */
+(function () {
+  const boot = document.getElementById('boot');
+  if (!boot) return;
+  let done = false;
+  const hide = () => {
+    if (done) return;
+    done = true;
+    boot.classList.add('gone');
+    setTimeout(() => boot.remove(), 500);
+  };
+  // 兩個條件都成立才淡出：
+  //   1. 字型就緒（最多等 1.8 秒）
+  //   2. 至少停留 2000ms —— 剛好是漸層動畫一整輪，讓它跑完再走
+  const fonts = (document.fonts && document.fonts.ready) ? document.fonts.ready.catch(() => {}) : Promise.resolve();
+  Promise.all([
+    Promise.race([fonts, new Promise(r => setTimeout(r, 1800))]),
+    new Promise(r => setTimeout(r, 2000)),
+  ]).then(() => requestAnimationFrame(hide));
+  setTimeout(hide, 3000);   // 保險：CDN 掛掉也不會卡在載入畫面
+})();
 
 </script>
 </body>
